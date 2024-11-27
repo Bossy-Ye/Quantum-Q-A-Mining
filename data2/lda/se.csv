@@ -1,0 +1,401 @@
+Id,AcceptedAnswerId,CreationDate,Score,ViewCount,Body,Title,Tags,AnswerCount,CommentCount,FavoriteCount,ClosedDate
+"455807","","2024-11-23 13:33:24","0","35","<p>I am reading <a href=""https://rads.stackoverflow.com/amzn/click/com/1492043451"" rel=""nofollow noreferrer"" rel=""nofollow noreferrer"">&quot;Fundamentals of Software Architecture&quot;</a> by Mark Richards &amp; Neal Ford. They introduce the notion of an <em>architectural quantum</em> (p 92):</p>
+<blockquote>
+<p>An independently deployable artifact with high functional cohesion and synchronous connascence.</p>
+</blockquote>
+<p>Let's break that apart.</p>
+<p>By <em><strong>independently deployable</strong></em> they mean it includes &quot;all the necessary components to function independently from other parts of the architecture&quot;. They don't define &quot;to function&quot;, but it is stated that &quot;if an application uses a database, it is part of the quantum because the system won't function without it.&quot;</p>
+<p>By <em><strong>high functional cohesion</strong></em> they mean &quot;how well the contained code is unified in purpose.&quot;</p>
+<p>By <em><strong>synchronous connascence</strong></em> they draw on a little-known measure of coupling—<a href=""https://en.wikipedia.org/wiki/Connascence"" rel=""nofollow noreferrer"">connascence</a>—introduced in <a href=""https://rads.stackoverflow.com/amzn/click/com/0932633315"" rel=""nofollow noreferrer"" rel=""nofollow noreferrer"">&quot;What Every Programmer Should Know About Object-Oriented Design&quot;</a>. Confusingly, for the purpose of their definition, they repurpose the term &quot;connascence&quot; to denote coupling on a higher-level architectural <em>component</em> level, e.g., a software package. Synchronous connascence (coupling) then implies &quot;synchronous calls within an application context or distributed services&quot; which prevent choosing meaningful differing &quot;architectural characteristics&quot; (the author's preferred name for non-functional requirements) for different components. For example, they state: &quot;If the caller is much more scalable than the callee, timeous and other reliability concerns will occur.&quot;</p>
+<p>I'm a sucker for good definitions with clear delineations (I'm an architect after all). But, at a glance, I see several problems with the proposed terminology:</p>
+<ul>
+<li>&quot;To function&quot; is ill-defined and depends on an ambiguous scope of functionality, which goes beyond the deployed artifact, to consider. The authors imply here that in microservice architectures a single microservice can &quot;function&quot; independently. But, even in an appropriate microservice decomposition, parts of an end-user's workflow will still stop &quot;functioning&quot;, even if only temporarily in case <a href=""https://en.wikipedia.org/wiki/Eventual_consistency"" rel=""nofollow noreferrer"">eventual consistency</a> is applied, if some of the dependent services are unavailable.</li>
+<li>Is there value in using a different name for the same concept at a different level of abstraction? I.e., connascence vs. coupling? Personally, I always understood &quot;coupling&quot; as a concept which can be applied to <em>any</em> level of abstraction in a codebase, i.e., within functions, between functions, between classes, or implicit knowledge a developer needs to know for two different parts of the codebase (semantic coupling). If connascence is a specific <em>measure</em> of coupling, why overload that term?</li>
+<li>This definition seems to mix architectural <em>goals</em> with a way to classify existing architectural components.</li>
+</ul>
+<p>While reading this, I kept thinking: isn't this just a <a href=""https://www.ibm.com/docs/en/dma?topic=diagrams-subsystems"" rel=""nofollow noreferrer""><strong>subsystem</strong></a>? As in, &quot;subsystem decomposition&quot;, and &quot;deployment diagrams&quot; in UML (emphasis mine).</p>
+<blockquote>
+<p>In UML models, subsystems are a type of stereotyped component that represent <strong>independent, behavioral units</strong> in a system. Subsystems are used in class, component, and use-case diagrams to represent large-scale components in the system that you are modeling.</p>
+</blockquote>
+<p>Certainly, I appreciate the attempt at a more precise definition, since UML <a href=""https://www.uml-diagrams.org/component.html#subsystem"" rel=""nofollow noreferrer"">keeps it intentionally vague</a>:</p>
+<blockquote>
+<p>Definitions of subsystems may vary among different domains and software methods. It is expected that domain and method profiles will specialize this element.</p>
+</blockquote>
+<p>But, I have a hard time understanding how the notion of &quot;architecture quantum&quot; can improve architectural discussions (especially given the esoteric definitions it relies on) over pre-existing terminology such as &quot;subsystem&quot;, &quot;coupling&quot;, &quot;non-functional requirements&quot;, &quot;deployment&quot;, &quot;microservice&quot;, and &quot;eventual consistency&quot;.</p>
+<p>In what ways is &quot;architecture quantum&quot; more specific or meaningful than &quot;subsystem&quot; or &quot;microservice&quot;?</p>
+","In what way is an ""architecture quantum"" distinct from UML subsystems?","<architecture><coupling><quality>","2","0","",""
+"452353","","2024-03-08 16:01:11","1","132","<p>I have been doing a lot of thinking lately about the implications of event-based/responsive programming and UML statecharts.</p>
+<p>I believe my thinking up to this point has been flawed. Take, for example, a toggle button/switch.  It has an internal state: pressed or released.  It also generates events: press and release.  The events represent the transitions between states.  Up until now, if I were to design a state machine that &quot;reacted&quot; to the button's state changes, but I needed a particular transition to be conditionally based upon the current state of the button, I would &quot;query&quot; the internal state of the button as part of a conditional transition/pseudostate (e.g., if the button were a class, the state machine would directly call button.state() before making its transition).</p>
+<p>I now think that this is flawed approach because it exposes the internal state of the button, couples the other state machine to an implementation (event if it may be abstract) of the button (rather than just reacting to its events), and it &quot;mixes metaphors&quot; by being reactive (to events) while simultaneously being sequential (blocking) programming.  This problem becomes more pronounced when the process of &quot;querying&quot; the internal state of something on which to make a decision is not so trivial (or, as mentioned in the book &quot;Practical Statecharts in C/C++&quot;, impossible if, for example, you are trying to &quot;view&quot; the state of a quantum particle; the very act resulting in the state being affected).</p>
+<p>With that discovery, I am trying to come up with other options that are truly reactive (i.e., based solely upon events).</p>
+<p>As an example, suppose I want to design a state machine with 3 states: A, B, and C.  It will handle 4 different events: B1_PRESS, B1_RELEASE, B2_PRESS, B2_RELEASE (i.e., events from two toggle buttons). If in state A, B1_PRESS transitions to state B. If in state B, B1_RELEASE transitions to state A. If in state A or B, B2_PRESS transitions to state C. However, when in state C, B2_PRESS transitions either to state A (if B1 is not pressed) or B (if B1 is pressed). In other words, B2 has higher priority than B1 in determining the state.</p>
+<p><strong>Option 1</strong></p>
+<p>Introduce an extended state variable used to store the current state of B1 based upon the events it produces.  Then use a conditional/choice pseudostate to transition based upon this extended state variable.</p>
+<p><a href=""https://i.sstatic.net/Ei3Vm.png"" rel=""nofollow noreferrer""><img src=""https://i.sstatic.net/Ei3Vm.png"" alt=""option 1 state machine"" /></a></p>
+<p>The problems I have with this option are a) I have to use an extended state variable and b) The state of B1 is now technically stored twice: once in the button itself and once in my state machine.  This might get pretty messy if I need to add more states and events.</p>
+<p><strong>Option 2</strong></p>
+<p>Defer the B1_PRESS and B1_RELEASE events while in state C.</p>
+<p><a href=""https://i.sstatic.net/PgtZQ.png"" rel=""nofollow noreferrer""><img src=""https://i.sstatic.net/PgtZQ.png"" alt=""option 2 state machine"" /></a></p>
+<p>This option is cleaner in notation than option 1.  It also doesn't add any extended state.
+The problem I have with this option is that, if while in state C the state of B1 does change, state B is still &quot;temporarily&quot; entered when exiting state C but before the deferred B1_RELEASE event is processed.  So, if the ENTER event of state B does some work, it will be wasted (or could cause weird problems).</p>
+<p>Are there other options I have not considered? Is my original &quot;revelation&quot; about trying to work with events only reasonable?</p>
+","Deferring/Saving State/Events in UML Statecharts","<uml><finite-state-machine><statechart>","2","0","",""
+"445188","445202","2023-04-23 17:35:46","0","459","<p>Suppose today I'm designing a new application that will employ asymmetric cryptography to allow users to securely exchange data with one another. As far as I can tell there are no quantum-safe algorithms yet generally accepted, let alone that are ready to be used in production. (Please correct me if I'm wrong!) Thus I'm assuming I'm still looking at RSA as the gold standard. Estimates for when RSA can be cracked vary from 5 to 15 years or more. 15 years doesn't bother me too much, but 5 years does, especially for a new application.</p>
+<p>So, if I'm starting from scratch, what would be considered the best practices to be as prepared as possible for a post-quantum world? And to explain what I mean by prepared, I don't simply mean ready to change algorithms, but rather to best ensure that data transmitted today won't be vulnerable in the future.</p>
+<p>Two things I've considered -</p>
+<ul>
+<li>Using 4096-bit keys. However I don't see a consensus on whether this actually makes much of a difference even for classical attacks, let alone quantum ones.</li>
+<li>Keeping public keys effectively private. My idea here is to keep even public keys within the confines of the secure application servers and unavailable to users. We would not allow clients to encrypt or verify sender signatures directly, but rather servers would hold public keys as closely as they hold their other secrets. Encrypting and verifying signatures would thus require client API calls.</li>
+</ul>
+<p>I'm wondering if these ideas add any genuine security value, or if not why not, and if there are other measures that experts would recommend at this time to architect a new application to be as resilient as possible to the so-called quantum apocalypse.</p>
+","Best practices for a new application to be ready for post-quantum cryptography","<security><encryption>","2","2","",""
+"376458","","2018-08-06 11:12:36","-1","217","<p>Is it possible to create an algorithm that will execute at the same rate and speed on faster and slow computers. What i mean is, i have a year 2000 desktop that can run a certain computational algorithm. a hundred years latter, quantum computers have arrived in their full capacity and i want to run the same algorithm. the Quantum computer should never be able to catch up with the slow computer. 
+The several ways i can think: </p>
+
+<ol>
+<li>Locking the execution of an algorithm to a specific time, but the problem with this is someone could possible alter the ticks in a second, eventually making the execution time very small, hence fastening the execution. </li>
+<li>Create a function that only uses a fixed amount on memory. for this i don't know how practical it is. </li>
+</ol>
+
+<p><strong>What could i do to achieve the desired consistency?</strong></p>
+","Executing an algorithm constantly on slow and fast machine","<algorithms><memory><memory-usage><speed>","1","3","",""
+"367045","367076","2018-03-04 23:09:24","4","1944","<p>A few days ago I found a <a href=""https://miguelmoreno.net/wp-content/uploads/2013/05/fYFBsqp.jpg"" rel=""nofollow noreferrer"">fun fact</a>, that finding a collision of 256-bit hash using brute-force is physically impossible in solar system.</p>
+
+<p>That made me think, what would happen if we used a good (uniform) 256-bit hash in a hash map. I guess, we could consider, that there are never false key hash matches, so we could get rid of the actual value of key in favor of storing only its hash.</p>
+
+<ol>
+<li>Would be space efficient? (No value of key, just hash)</li>
+<li>Would it be fast? (No collision check, but bigger hash than usual)</li>
+<li>Would it be safe? (Statistically)</li>
+<li>Has anybody done this?</li>
+</ol>
+
+<p>Yes, there could be way fewer buckets than 2^256. The goal is to calculate the hash, find bucket and then find the actual value inside the bucket using ONLY the full 256-bit hash and without actual value check. For example in hash map where keys are strings, there could be no equality confirmation, so no actual bytes comparison and no potentially big key storage.</p>
+
+<p>There seems to be a lot of disregard towards 2^256 combinations. To give you the scale, the estimated number of atoms in the known universe is between 10^78 and 10^82, roughly 2^260 and 2^270. Humankind will probably never produce all possible 256-bit numbers.</p>
+
+<p>Yes, the quantum computers will be able to find collisions in split seconds. But future cryptographic safety is not the point, the point is simplification of in-memory, std-lib grade collections for internal use in applications.</p>
+","Hash map without collision check","<collections><map>","4","19","",""
+"339855","339892","2017-01-10 10:55:27","12","2262","<p>I one failed at an algorithmic test with Codility because I tried to find a better solution, and in the end I had nothing.</p>
+
+<p>So it made me think if I could use an approach similar to TDD?
+I.e. If I can usually develop a solution gradually in similar fashion?</p>
+
+<p>If I were writing a sorting algorithm I could move from a standard Bubblesort to a 2-way bubblesort, but then something more advanced like Quicksort would be a ""quantum leap"", but at least I would have testdata I can easily validate.</p>
+
+<p>Other tips for such tests?  One thing I would do the next time is to use more methods/functions than inner loops.  For example, in sorting, you often need a swap.  If it were a method I would just need to modify the calling code. 
+I could even have more advanced solutions as derived classes.</p>
+
+<p>With ""Algorithmic"" vs ""normal"" problems I mean problems where Time-complexity is important.  So instead of passing more tests as in TDD, you would make it ""behave better"".</p>
+
+<p>With ""similar to TDD"" I mean:</p>
+
+<ol>
+<li>Write relatively automatic test to save time on manual tests pr increment.</li>
+<li>Incremental development.</li>
+<li>Regression testing, ability to detect if code breaks or at least if functionality changes between increments.</li>
+</ol>
+
+<p>I think this should be quie easy to understand if you compare</p>
+
+<ol>
+<li>Writing a shell-sort directly </li>
+<li>Jumping from bubblesort to quicksort (Total rewrite)</li>
+<li>Moving incrementally from a one-way bubble-sort to shell sort (If possible).</li>
+</ol>
+","TDD like approach to Algorithmic problems","<algorithms><tdd>","3","13","",""
+"339048","339082","2016-12-29 02:55:39","1","183","<p>(For more backstory/explanation, see <a href=""https://softwareengineering.stackexchange.com/questions/339028/creating-a-good-problem-statement"">my previous question</a>.)</p>
+
+<p>I'm a middle school student working on a very, very informal project; my problem statement is as follows:</p>
+
+<blockquote>
+  <p>There is no way for theoreticians, researchers, and students in the field of quantum computing to simulate and test complex, large quantum circuits in an intuitive, efficient way without creating the code for the application themselves. A web application that works in popular browsers with an simple interface that could accurately produce results on the outcomes of quantum algorithms, error correction codes, entanglement, decoherence, and the other aspects of both an ideal and realistic interface would allow professionals and students alike to test their ideas and get a better understanding of the field of quantum computing.</p>
+</blockquote>
+
+<p>So, as I am working through the book Code Complete, the next step was to list requirements. As I've never done this before and it is such an informal project, I am unsure if the requirements list I came up with is any good, or if there are improvements that should be made to it. So here's the list:</p>
+
+<ol>
+<li>Takes in as input starting state of the qubits, each gate to be applied to which qubit, how many qubits should be used, and what implementation of quantum computing they'd like to test in (for decoherence time estimates).</li>
+<li>Outputs should be current state of every qubit and probability of |0> and |1> state for every qubit.</li>
+<li>Outputs should be given on the website and downloadable along with inputs in a text file. </li>
+<li>State of qubits should be a vector, probability should be a number from 0 to 1, gates should be one of several commonly used gates or the custom gate option.</li>
+<li>Inputs for gates should be one of several buttons (pressed).</li>
+<li>Inputs for state and number of qubits should be integer input.</li>
+<li>Once user inputs data and presses the button to compute, it should not take very long to produce the answer (e.g., one minute <em>max</em> for 5 qubit calculations is one benchmark).</li>
+<li>Should be a website interface, with input blanks based on previous user input, i.e., create an account to save your simulations (takes in email and password), then a tab to look at previous text files from simulations and a tab to create a new simulation. Then, the user would input the number of qubits and starting state of qubits, click next and it will have you list gates for 1st qubit, click done, 2nd qubit, etc. If the option inputted is custom gate, a blank pops up where you can fill in the necessary data for the gate. When done, it transitions to a ""calculating"" style screen, and then gives the result and text file to download, with an option to save and an option to start over (last option available throughout).</li>
+<li>The safety of the user's email, password, and text files must be high, as there could be important/confidential research-related information stored there.</li>
+<li>Place on site to report bugs and request improvements.</li>
+<li>Has common quantum gates available <em>and</em> a custom gate option.</li>
+<li>Simulates decoherence, entanglement, and other common features of quantum computing.</li>
+<li>Allows choice between ideal (no decoherence) and non-ideal (decoherence) quantum computer.</li>
+<li>Generalizable to large numbers of qubits (runs as efficiently as possible). </li>
+<li>Documentation on-site for users.</li>
+<li>Accurate results (basic cases, at minimum, checked against accepted results.</li>
+<li>Option to make text files public/private and a location to access public simulations?</li>
+</ol>
+","One-person, informal project - creating good requirements","<design><requirements><software><code-complete>","1","5","",""
+"339028","339035","2016-12-28 19:50:29","11","5201","<h2>&lt; backstory &gt;</h2>
+<p>I grabbed a book called Code Complete at a used bookstore the other day because I heard it was a great book, and started reading it. After around 10 pages I realized that I've been kind of stupid about a recent project I've been working on. A bit of clarification I should put in at this point: I'm not at a job, and this is not for school; it's about as informal as it gets (I'm also the only one working on it though I have asked questions on SO occasionally). I'm in middle school and trying to create a piece of software.</p>
+<p>Long story short, I jumped right into the coding (and am now questioning some decisions I made on the spot about how he code works). So I'm trying to sort of start over the right way.</p>
+<h2>&lt; /backstory &gt;</h2>
+<p>Okay, so I'm trying to create a problem statement and I wanted to know what some good tips were to know if I had a good one. Code Complete said that it should be non-technical and from the user's point of view, which I tried to do.  Any advice would be appreciated on making it better.</p>
+<blockquote>
+<p>As far as I know, there is currently no good way to simulate large, complex quantum computing circuits, including such features as decoherence, error correction, entanglement, and algorithms on a classical computer, let alone with a system that is standard/well-known and easily accessible.</p>
+</blockquote>
+<p>Sorry if it's absolutely terrible, this is my first time doing any of this.</p>
+<p><strong>Edit - Draft 2:</strong></p>
+<p>I rewrote using the suggestions in the comments and the answer.</p>
+<blockquote>
+<p>There is no way for theoreticians, researchers, and students in the field of quantum computing to simulate and test complex, large quantum circuits in an intuitive, efficient way without creating the code for the application themselves. A web application that works in popular browsers with an simple interface that could accurately produce results on the outcomes of quantum algorithms, error correction codes, entanglement, decoherence, and the other aspects of both an ideal and realistic interface would allow professionals and students alike to test their ideas and get a better understanding of the field of quantum computing.</p>
+</blockquote>
+","Creating a good problem statement","<design><software><code-complete>","1","7","",""
+"332795","332800","2016-10-04 20:17:00","9","19132","<p>I've recently read a number of (layman's) articles on quantum mechanics and quantum computing, and keep seeing examples along the lines of ""Quantum computing can crack passwords quickly by trying all combinations at once"".  The example goes on to show that rather than passing in an N-bit value, an N-qubit value is passed in which is effectively all combinations due to its superposition state.  The value is then collapsed to the state which was successful; i.e. giving the correct password.</p>
+
+<p>The problem I have with this example, is it assumes that our <code>ValidatePassword</code> function accepts a qubit array as an input; which I suspect people would know better than to do.</p>
+
+<p>Is this example just an oversimplification to demonstrate something which tries many possibilities at once; or is there a real potential security concern with the advent of quantum computers?</p>
+","Will quantum computers be able to easily crack passwords?","<passwords><physics>","2","4","",""
+"314736","314754","2016-04-04 20:25:30","3","1978","<p>Does anyone know why something like <a href=""https://web.archive.org/web/20160330191802/http://www.ipd.uka.de/JavaParty/cj"" rel=""nofollow noreferrer"">cj library for complex numbers</a>  was never completed and integrated into mainline Java?</p>
+
+<p>This seems like a no-brainer... I realize the Java gawds don't want to turn Java into C++ but this is a thing that C++ handles beautifully and this guy's implementation (written 17 years ago!) handles excellently but is now hopelessly out of date to be of practical use.</p>
+
+<p>Yes. Add quaternions and octonions too. But that's all. I'm not suggesting a Pandora's box. The real, complex, quaternionic, and octonionionic numbers are the only normed division algebras. You could argue against that though, staying in the realm of * always being commutative as far as order of operations is concerned. Go back and read the article I linked to in the OP. Spawning millions of temporary objects to spam the GC is wasteful and makes Java jot suitable for some tasks that it could be easily made to be suitable. The thing that distinguishes a primitive is that it is a unit, and not a pointer to a heap. If you go that OO extreme you might as well join the camp that is saying double primitives should be done away with too. Yes what I'm suggesting amounts to a builtin operator that compiles to byte codes that is complete standard and maps to a pair of doubles. See the cj implementation and README I linked to. Full blown operator overloading would be a mess but  this easily doable. </p>
+
+<p>I am not suggesting only extension of language to complex types. </p>
+
+<p>For my ideas, see the article I wrote up summarizing this book about Clifford Algebras</p>
+
+<p><a href=""http://vixra.org/abs/1203.0011"" rel=""nofollow noreferrer"">http://vixra.org/abs/1203.0011</a></p>
+
+<p>For instance, complex data types are central to quantum computing.. but also, the comment below about the user-defined types, while neat, does not lend itself to stringing together high-performance complex (no pun intended) code which can be spun on the fly by the jvm or whatever hardware, quantum, classical, or otherwise... already thinking ahead here.. and no, this is not a proliferation of messing up ""java purity"" but is actually the rigorous, scientific, etc, e.g. GOOD, way of doing things.. it opens up possibilities for those who can use them.</p>
+
+<p>For instance, these constructs (no I didn't just pick this out of thin air, but <em>nearly</em> so..) sound like the perfect fit for some applications to compiler theory and turning machines and user input/output (modeled as observables as output and stochastic processes as input) .. </p>
+
+<blockquote>
+  <p>1.2.3. Exact Sequences, Centers, and Centralizers.
+  A group G is simple if it has no normal subgroups other than {e} and G. The group with one element is denoted by 1 if the composition law is multiplication, or 0 if the composition law is addition. Suppose that a sequence of groups {G0 = 1, G1,     , Gk, Gk+1 = 1} is given and that θj: Gj → Gj+1 is a morphism for ...then the diagram...is an exact sequence if θj−1(Gj−1) is the kernel of θj∀1 6 j 6 k. When k = 3 the sequence is a short exact sequence. }</p>
+</blockquote>
+","Why isn't there a primitive ""complex number"" type in Java?","<java><compiler><data-types>","4","19","",""
+"287397","287445","2015-06-20 17:44:49","2","2488","<p>I am building an API for minecraft called the <a href=""http://www.minecraftforum.net/forums/mapping-and-modding/minecraft-mods/wip-mods/2344753-the-quantum-api-a-better-alternative-to-forge-and"" rel=""nofollow"">Quantum API</a>. We all know that reflection can be used to do some nasty stuff to classes, and even cause undefined behavior if used without care.</p>
+
+<p>Is there a way to make classes and objects immune to reflection? Perhaps with a security manager? Or vice versa, restrict a certain list of classes/objects from using reflection?</p>
+
+<p>My use would be to prevent other mods that are loaded with this API from using reflection to change a RuntimePermission in a SecurityManager, and to prevent modification of minecraft's base classes (and objects) at runtime, as well as the API's own classes (and objects).</p>
+","How can I make an object/class inaccessible to Reflection","<java><reflection><code-security>","1","8","",""
+"258475","258483","2014-10-08 16:34:57","4","4208","<p>We are planning to use Git pull requests for code review in our company. Before we start I have a basic question: How often should I open a pull request? Is it best to open one for every little commit I create? Or should I open a single pull request for a larger quantum of work, such as all the commits in, say, a user story? What is the right size?</p>
+
+<p>What do you do in your team?</p>
+","How often to open pull requests","<git><code-reviews>","1","1","","2014-10-13 21:05:33"
+"242657","242660","2014-06-01 14:51:17","23","4258","<p>Say Alice and Peter each have a 4GB USB flash memory stick. They meet and save on both sticks two files named <code>alice_to_peter.key</code> (2GB) and <code>peter_to_alice.key</code> (2GB) which contain randomly generated bits. They never meet again, but communicate electronically. Alice also maintains a variable called <code>alice_pointer</code> and Peter maintains variable called <code>peter_pointer</code>, both of which are initially set to zero.</p>
+
+<p>When Alice needs to send a message to Peter, she does (where <code>n</code> is the nth byte of the message):</p>
+
+<pre><code>encrypted_message_to_peter[n] = message_to_peter[n] XOR alice_to_peter.key[alice_pointer + n]
+encrypted_payload_to_peter = alice_pointer + encrypted_message_to_peter
+alice_pointer += length(encrypted_message_to_peter)
+</code></pre>
+
+<p><del>(and for maximum security, the used part of the key can be erased)</del></p>
+
+<p>Peter receives <code>encrypted_payload_to_peter</code>, reads <code>alice_pointer</code> stored at the beginning of message and does:</p>
+
+<pre><code>message_to_peter[n] = encrypted_message_to_peter[n] XOR alice_to_peter.key[alice_pointer + n]
+</code></pre>
+
+<p><del>And for maximum security, after reading of message also erase the used part of the key.</del>
+- EDIT: In fact this step with this simple algorithm (without integrity check and authentication) decreases security, see Paŭlo Ebermann post below.</p>
+
+<p>When Peter needs to send a message to Alice they do the reverse, this time with <code>peter_to_alice.key</code> and <code>peter_pointer</code>.</p>
+
+<p>With this trivial schema they can send each day for the next 50 years 2GB / (50 * 365) = ~115kB of encrypted data in both directions. If they need more data to send, they could use larger keys, for example with today's 2TB HDs (1TB keys) it would be possible to exchange 60MB/day for the next 50 years! That's a lot of data in practice; for example, using compression it's more than hour of high quality voice communication.</p>
+
+<p>It seems to me that there is no way for an attacker to read the encrypted messages without the keys, because even if they have an infinitely fast computer, with brute force they can get every possible message under the limit, but this is an astronomical number of messages and the attacker doesn't know which of them is the actual message.</p>
+
+<p>Am I right? Is this communication scheme really absolutely secure? And if it is secure, does it have its own name? XOR encryption is well-known, but I'm looking for the name of this concrete practical application using large keys on both sides? I am humbly expecting that this application has been invented someone before me. :-)</p>
+
+<p><del>Note: If it's absolutely secure then it's amazing, because with today's low cost large storage devices, it would be much cheaper to do secure communication than with expensive quantum cryptography, and this has equivalent security!</del></p>
+
+<p><strong>EDIT:</strong>
+I think this will be more practical in the future as storage costs decrease. <del>It can solve secure communication forever.</del> Today you have no certainty if someone successfully attacks existing ciphers even a year later and makes its often expensive implementations insecure. In many cases before communication occurs, when both sides meet personally, that's the time to generate the keys. I think it's perfect for military communication, for example between submarines which can have HDs with large keys, and military central can have a HD for each submarine. It could also be practical in everyday life, for example to control your bank account, because when you create your account you meet with the bank etc.</p>
+","Is this simple XOR encrypted communication absolutely secure?","<communication><encryption>","4","10","",""
+"240613","","2014-05-20 13:42:59","5","517","<p>Consider the following problem:</p>
+
+<hr>
+
+<p><strong>Description</strong>:</p>
+
+<p>There are n jobs J<sub>1</sub>...J<sub>n</sub> with cycle times C<sub>1</sub>....C<sub>n</sub>. Find a <em>time quantum</em> and a scheduling table considering that:</p>
+
+<ul>
+<li>any element of the table contains at most one job</li>
+<li>the job handler will process an element at a time, i.e. execute the job (if any) then, after a <em>time quantum</em> passes, moves to the next element.</li>
+<li>the job handler will loop-back, i.e. after the last element it will continue with the first.</li>
+<li>the ciclicity must be maintained, i.e. the distance between any two consecutive (including loop-back) occurances of job J<sub>k</sub> (k = 1,n) must be equal to C<sub>k</sub> / <em>time quantum</em>.</li>
+<li>the table must be as short as possible.</li>
+</ul>
+
+<p><strong>Example</strong>:</p>
+
+<ul>
+<li>J<sub>1</sub> - 4 seconds ciclicity</li>
+<li>J<sub>2</sub> - 6 seconds ciclicity</li>
+<li>J<sub>3</sub> - 8 seconds ciclicity</li>
+</ul>
+
+<p><strong>Example solution</strong>:</p>
+
+<p>time quantum = 1s</p>
+
+<pre><code>0  1  2  3  4  5  6  7  8  9  10 11 12 13 14 15 16 17 18 19 20 21 22 23 24 seconds
++--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+
+|J1|J2|J3|  |J1|  |  |J2|J1|  |J3|  |J1|J2|  |  |J1|  |J3|J2|J1|  |  |  |
++--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+
+</code></pre>
+
+<hr>
+
+<p>My feeling is that this belongs to the family of scheduling problems and that it may be a special case of a more general problem. <strong>Is this so?</strong>
+ I tried to search for it online but didn't find anything that looks similar.
+ Since I don't have any experience with scheduling problems I'm not even sure what to search for.</p>
+
+<p>From what I see:</p>
+
+<ul>
+<li>the total duration of the schedluing table should be the smallest common multiple of C<sub>1</sub>...C<sub>n</sub>.</li>
+<li>the time quantum should be at least GCD(C<sub>1</sub>,...,C<sub>n</sub>) / n. - This is not necessarly the optimal solution.</li>
+</ul>
+
+<p>This leads me to believe that there is a straight forward solution and not one involving dynamic programming. <strong>Is this so?</strong></p>
+
+<p>Can somebody point me to some resources, maybe even an algorithm, for this problem? </p>
+
+<p>I'm also curious about variations where there the jobs can be distributed between more than one scheduling tables.</p>
+
+<hr>
+
+<p>GCD = Greatest Common Divider</p>
+
+<p><strong>Edit</strong>: I'm not asking how to schedule N jobs with given cycle times; I'm sure there are more dynamic ways to do this as some suggested. My problem is ""<em>Find a time quantum and a scheduling table considering that:[...]</em>"". It's even possible that it may have it's roots in some parts of mathematics.</p>
+","Does anybody recognize this scheduling problem? Is there an algorithm for it?","<algorithms><problem-solving><scheduling>","1","12","",""
+"225406","","2014-01-25 02:47:24","7","1185","<p>I am about to start a new project and I cannot decide if I should pick OCaml or Lisp for the project.  My main concern is about the difference of productivity — if any. </p>
+
+<p>I program OCaml since 1998 and, while I neither tried to measure this precisely nor to even define precisely what the productivity I would like to measure is, I am pretty confident that I am more productive with OCaml than I am with more classical languages I know, as C or Python. I think so, because the compiler is so good at catching my errors, that only the smart bugs make it to the final program—but these are usually easy to find, like some logic piece being semi-obviously wrong or system resources inappropriately manipulated.  I never invested in learning the debugger of OCaml — which by the way can go backwards in the time—because I had never felt I needed using it. The language has a module system allowing generalisation of structures by means of <em>functors</em> and a preprocessor <code>camlp4</code>  which can be used to extend the language, like implementing automatic serialisation of values.</p>
+
+<p>This is of course something that Lisp has not—but I tried Slime in Emacs, and it looks to include an all-mighty debugger and code explorer.  But Lisp has macros.</p>
+
+<p>Unfortunately, my knowledge in Lisp is almost zero—I toyed around with it about one afternoon—and I am therefore unable to compare macros with <code>camlp4</code>.  To me, it seems that:</p>
+
+<ul>
+<li>Lisp macros are much easier to write than <code>camlp4</code> extensions.</li>
+<li>Lisp macros are much easier to use as modules or <code>camlp4</code> extensions. Functors, when used to implement a functionality similar to <em>traits</em> are quite clumsy, verbose, and require odd-looking idiosyncratic invocations: on the other side, Lisp macros just look like anything else in Lisp (S-expressions).</li>
+<li>Lisp macros do not raise an engineering problem, they belong to a package, dot. Functors do raise engineering problems because type names receive aliases, which is puzzling.</li>
+</ul>
+
+<p>(As a side note, it looks to me that Lisp is easier to get started with than OCaml is, at least for the bunch of quantum physicists wanting to join the project.)</p>
+
+<p>Can anyone compare the incidence on productivity of OCaml and Lisp (pick the one you want)?</p>
+","Hoes dows the productivity incidence of Lisp and OCaml compare?","<productivity><lisp><ocaml>","0","2","","2015-10-12 21:58:04"
+"212895","","2013-09-29 21:17:40","2","3748","<p>I'm trying to use MQS to create a Gantt chart of 5 processes (P1-P5) as well as their waiting, response, and turnaround times (and averages of those metrics) within a CPU task schedule. Here's the basic table of arrival times and bursts:</p>
+
+<p><img src=""https://i.sstatic.net/iyZJx.jpg"" alt=""enter image description here""></p>
+
+<p>Here's my actual work version after ticking off the finished processes.  The time quantum for each time slice is (2 queues) TQ1=4 and TQ2=3. Note that I'm doing MQS and NOT MLFQ:</p>
+
+<p><img src=""https://i.sstatic.net/7KNh8.jpg"" alt=""enter image description here""></p>
+
+<p>It just doesn't feel like I'm doing MQS right here, I know this gets a little complex but maybe someone can point out where I'm going totally wrong.</p>
+","Multilevel Queue Scheduling (MQS) with Round Robin","<operating-systems><scheduling><gantt-chart>","1","0","",""
+"199065","199097","2013-05-22 17:50:55","2","506","<p>I was thinking of an hypothetical programming language with a <code>kleenean</code> data type which would implement Kleene's <a href=""http://en.wikipedia.org/wiki/Three-valued_logic#Kleene_logic"" rel=""nofollow"">three-valued logic</a>. To sum up, it's an extension of the boolean data type with the three constants <code>true</code>, <code>false</code> and <code>unknown</code> where <code>unknown</code> means that the value is either <code>true</code> or <code>false</code>, but we don't know which.</p>
+
+<p>The truth tables for a kleenean type are well-known and the logic is quite easy to understand. However, I was wondering how one would design a conditional construct to take in account this <code>unknown</code> value.</p>
+
+<p>A basic <code>if-then-else</code> conditional construct is almost always as follows:</p>
+
+<pre><code>if (boolean condition) then
+    condition is true, do something
+else
+    condition is false, do some other thing
+end
+</code></pre>
+
+<p>However, I have troubles seeing what a kleenean <code>if</code> construct would look like. How could we interpret the <code>unknown</code> constant? Technically speaking, it could satisfy the <code>true</code> condition as well as the <code>false</code> condition since it is one of these two. However, we can't have it match any of those since it could be the other, it is not really <code>true</code> nor <code>false</code>.</p>
+
+<p>Is there a well-known way to implement such a construct?</p>
+
+<p><strong>EDIT:</strong> To specify a little bit, I would prefere something different than the way <code>boost::tribool</code> works, or from a simple <code>switch</code> as if was an enum. Answers about quantum superposition and semantics are welcome.</p>
+","Conditional construct for a kleenean data type","<language-design><conditions><control-structures>","3","9","",""
+"195040","","2013-04-15 23:54:23","4","22332","<p>I saw a video about random numbers and how the programmer in that video was talking about computers generating pseudo random numbers and that they are not really random. I knew about this.</p>
+
+<p>Then he showed the decay of a radioactive material to generate random numbers where he claimed to be truly random. Is there really such a thing? I mean the process of the radioactive material shooting electrons might seem random but is it? Isn't it just a mysterious black box to us simply because we don't know how it really works?</p>
+
+<p>Or does randomness just depend on the current level of scientific knowledge?</p>
+
+<p>If so, then how come quantum computers are often quoted to be capable of generating truly random numbers? Can they really do this?</p>
+","Is there such a thing as truly random?","<computer-science><math><random>","4","9","","2013-04-16 02:14:05"
+"194631","","2013-04-11 07:19:07","1","494","<p>From <a href=""https://softwareengineering.stackexchange.com/questions/194552/what-is-the-difference-between-quantum-annealing-and-simulated-annealing"">that</a> question about differences between Quantum annealing and simulated annealing, we found (in comments to answer) that physical implementation of quantum annealing exists (D-Wave quantum computers).</p>
+
+<p>Can anyone explain that algorithm in terms of quantum gates and quantum algorithms, or in physical terms (a part of algorithm that depends on quantum hardware)?</p>
+","The physical implementation of quantum annealing algorithm","<algorithms><computer-science>","2","1","",""
+"194552","194554","2013-04-10 12:33:10","6","3033","<p>In both algorithms objective functions, that will be executed with non quantum computers, are used. Both algorithms are methods for finding the global minimum of a given objective function. </p>
+
+<p>From <a href=""http://en.wikipedia.org/wiki/Quantum_annealing#Comparison_to_simulated_annealing"">wikipedia</a>: </p>
+
+<blockquote>
+  <p>Quantum annealing can be compared to <a href=""http://en.wikipedia.org/wiki/Simulated_annealing"">simulated annealing</a> (SA), whose ""temperature"" parameter plays a similar role to QA's tunneling field strength.</p>
+</blockquote>
+
+<p>What is meant by ""tunneling field strength""?</p>
+
+<p>The choice of next candidate state seems to be the only difference between the algorithms, is that correct?</p>
+
+<p>Finally, what are the advantages of Quantum annealing? Is it faster, or is it just better at handling local minima?</p>
+","What is the difference between Quantum annealing and simulated annealing?","<algorithms><computer-science>","1","1","",""
+"184936","","2013-01-26 14:52:17","1","3286","<p>I have to calculate the proper quantum of time for <a href=""http://en.wikipedia.org/wiki/Round-robin_scheduling"" rel=""nofollow"">Round Robin process scheduling</a> algorithm. As I read in <a href=""http://en.wikipedia.org/wiki/Andrew_S._Tanenbaum"" rel=""nofollow"">Tanenbaum's</a> book, the quantum of time should cover like 80% of the running time of all processes.</p>
+
+<p>Is there a formula how to find the optimal quantum of time?</p>
+","Round Robin - how to determine the optimal quantum of time?","<unix><scheduling><process>","1","1","",""
+"163527","","2012-09-03 19:27:56","0","13789","<p>Just going over my school notes, my teacher identifies <em>multi-tasking OS</em>, and <em>time-sharing OS</em> as two different things.<br>
+I really don't see a difference between the two.<br>
+<strong>MULTI-TASKING</strong>: You load a number of programs in the memory and execute them. You execute another program if the time quantum allocated to the current program expires OR if it goes on to do I/O and leaves the CPU OR if it finishes execution.<br>
+<strong>TIME-SHARING</strong>: the same,again.<br>
+The same applies in case of <em>serial processing</em> and <em>batch processing</em>. Although they are the same, I guess the only difference would be the way in which control information is passed to the CPU. Maybe, and again MAYBE, in serial processing you need to provide the punch cards with all the processes while in batch, the entire batch uses the same set of control information.<br>
+Like all the print jobs would have the same control information.</p>
+","Is there a difference between multi-tasking and time-sharing?","<operating-systems>","5","3","",""
+"161119","","2012-08-16 14:05:50","34","7135","<p>How is programming a quantum algorithm different? What would a C like language look like if it was designed for qubits? Would types change?</p>
+","How will quantum computing change programming?","<programming-languages><algorithms>","3","3","","2013-09-11 22:26:28"
+"114056","","2011-10-12 17:01:18","8","5270","<p>I've been reading up a lot lately on various web application deployment processes using SVN or GIT, with a view to redesigning how we currently deploy where I work.</p>
+
+<p>As is the way with many flavours of Agile, it's assumed that anything committed to master or trunk is production ready. Both GitHub and Etsy, <a href=""http://codeascraft.etsy.com/2010/05/20/quantum-of-deployment/"">http://codeascraft.etsy.com/2010/05/20/quantum-of-deployment/</a> say that they work on this basis (although Etsy actually have a staging environment).</p>
+
+<p>This process assumes all unit test and CI tests have been run. You run the tests locally and on CI and then commit to trunk. SO, at this point your code is <strong>technically</strong> sound.</p>
+
+<p>Your code may be technically correct, but user/functional testing may unearth more bugs, particularly when it comes to front end testing.</p>
+
+<p>My question is this. Where do QA and Business owners test the feature changes you have implemented? On your local development machine before you commit to trunk, or on a QA/staging machine? </p>
+
+<p>If you have a staging machine that runs off trunk, and you assume that all code committed to trunk is production ready ... eh .. then at what point is the code signed off and good to go into production from both a technical and business perspective? If you have only one staging machine, many developers and that is where the code is to be QA'd, then how can you deploy from trunk as many developer changes can be waiting for sign off.</p>
+
+<p>I'd be interested to hear how others have approached this?</p>
+","Agile development deployment process. Where do QA and Business Owners test?","<git><unit-testing><svn><testing><deployment>","3","0","",""
+"93334","93346","2011-07-16 11:10:39","0","414","<p>Is there some kind of generalization to the effect called Heisenbug? Because I would like to describe in my documentation how instrumenting a program changes the execution no matter what.</p>
+
+<p>In <a href=""http://www.outpost9.com/reference/jargon/jargon_23.html#SEC30"" rel=""nofollow"">The New Hacker's Dictionary</a> it is defined as following:</p>
+
+<blockquote>
+  <p><strong>heisenbug</strong> /hi:'zen-buhg/ /n./ [from Heisenberg's Uncertainty Principle in quantum physics]</p>
+  
+  <p><strong>A bug that disappears or alters its behavior when one attempts to probe or
+  isolate it.</strong> (This usage is not even particularly fanciful; the use of
+  a debugger sometimes alters a program's operating environment
+  significantly enough that buggy code, such as that which relies on the
+  values of uninitialized memory, behaves quite differently.) Antonym of
+  Bohr bug; see also mandelbug, schroedinbug. In C, nine out of ten
+  heisenbugs result from uninitialized auto variables, fandango on core
+  phenomena (esp. lossage related to corruption of the malloc arena) or
+  errors that smash the stack.</p>
+</blockquote>
+
+<p>Actually this is a general problem, when trying to observe the programs state by instrumentatation (tracing, debugging, etc.) the program execution is changed no matter what. But the definition for Heisenbug clearly says, it is a bug which is masked due to debugging and which disappears. What about bugs, which appear due to debugging - there is no word for that.</p>
+
+<p>Is there some kind of generalization, like <em>Heisenbug principle</em>?</p>
+","Terminology question: Generalize Heisenbug","<terminology><debugging>","2","6","",""

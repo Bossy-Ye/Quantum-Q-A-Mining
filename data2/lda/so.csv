@@ -1,0 +1,1068 @@
+Id,AcceptedAnswerId,CreationDate,Score,ViewCount,Title,Tags,AnswerCount,Body
+"79060676","79072024","2024-10-07 05:26:33","1","126","Are Q# and the Microsoft Quantum Development Kit available for Visual Studio 2022?","<visual-studio><quantum-computing><q#><qdk>","1","<p>A couple of years ago, the Microsoft Quantum Development Kit was introduced for Visual Studio 2022.  However, the <a href=""https://marketplace.visualstudio.com/items?itemName=quantum.DevKit"" rel=""nofollow noreferrer"">published link</a> now returns a Page Not Found message, and searching through the Visual Studio Marketplace does not bring up any relevant tools.</p>
+<p>Doing a Google search for the QDK returns results only for the VS Code extension/tools.</p>
+<p>Has Microsoft discontinued QDK and Q# support for the full version of Visual Studio?  Is VS Code the only option now?</p>
+"
+"79002429","","2024-09-19 12:04:45","1","32","QuTiP mcsolve TypeError: Incompatible dimensions when passing initial state","<physics><dimensions><quantum-computing><qutip>","0","<p>I'm trying to simulate the dynamics of an open quantum system using the mcsolve function from QuTiP,</p>
+<pre><code>mc = mcsolve(H, psi0, dt, [L1,L3], [op], ntraj = 5)
+</code></pre>
+<p>but I keep running into a TypeError regarding incompatible dimensions when running the code. Below is the error message:</p>
+<pre><code>TypeError: incompatible dimensions[[2, 2], [2, 2]], [[2, 2, 1], [2, 2, 1]]
+</code></pre>
+<p>I suspect the issue might be related to how the initial state psi0 is constructed</p>
+<pre><code>from qutip import rand_ket
+def psi0(n_qubits):
+    &quot;&quot;&quot; Creates a random pure state for an n-qubit system. &quot;&quot;&quot;
+    # Calculate the dimension of the Hilbert space
+    dim = 2**(n_qubits)
+    
+    # Create a random column vector and normalize it
+    psi_0 = rand_ket(dim)
+    
+    return psi_0
+</code></pre>
+<p>or how the operators L1 and L3 are constructed</p>
+<pre><code>from qutip import mcsolve,Qobj, tensor, sigmax, sigmay, sigmaz, qeye
+# Define the Gamma values (dissipation rates)
+nsite = 2
+Gamma1 = 0.1
+Gamma2 = 0.1
+Gamma3 = 0.1
+Gamma4 = 0.1
+
+# Define spin operators for Lindblad terms
+sigmap = (sigmax() + 1j * sigmay()) * 0.5
+sigmam = (sigmax() - 1j * sigmay()) * 0.5
+
+# Define identity matrices for tensor products
+identity_nsite_1 = qeye(2 ** (nsite - 1))
+identity_nsite_2 = qeye((2**nsite/2))
+identity_nsite_3 = qeye(2**((nsite/2)-1))
+
+
+# Construct Lindblad operators
+L1 = Gamma1 * tensor(sigmap, identity_nsite_1)
+L3 = Gamma3 * tensor(identity_nsite_2, sigmap, identity_nsite_3)
+</code></pre>
+<p>I tried to print out the dimensions of the operators (H, L1, L3, op) and the wavefunction (psi0), they all seem to be consistent. Here’s the output for their dimensions:</p>
+<pre><code>Dimension of H: (4, 4); Dimension of L1: (4, 4); Dimension of L3: (4, 4); Dimension of op1: (4, 4); Dimension of psi0: (4, 1)
+</code></pre>
+<p>Despite this, the error persists. I expected the code to run without errors because the dimensions seemed to match correctly.</p>
+<p>Any help or suggestions would be greatly appreciated!</p>
+<p>Thanks in advance!</p>
+"
+"78912366","78933884","2024-08-25 22:05:58","2","109","Use AES-256 with python's cryptography.fernet.Fernet by changing values of _signing_key and _encryption_key fields","<python><cryptography><aes><quantum-computing><python-cryptography>","1","<p>I want to use AES-256 with python's cryptography.fernet.Fernet class. I have generated two keys with Fernet.generate_key() and tried to run the version of the following code (where instead of key1 and key2 there are actual keys):</p>
+<pre class=""lang-py prettyprint-override""><code>import base64
+from cryptography.fernet import Fernet
+
+f = Fernet(Fernet.generate_key())
+
+f._signing_key = base64.urlsafe_b64decode(key1)
+f._encryption_key = base64.urlsafe_b64decode(key2)
+
+token = f.encrypt(b'Secret message!')
+print(f'{token}')
+
+print(f.decrypt(token).decode())
+</code></pre>
+<p>It worked, but does this use AES-256 instead of AES-128?</p>
+<p>Also, is this code quantum computers resistant? If this is not the case, how can I use Fernet class to do post-quantum cryptography?</p>
+"
+"78799576","78801021","2024-07-26 18:59:41","2","176","How can I save quantum gates as a graphic in png/svg format using Qiskit?","<python><quantum-computing><qiskit>","2","<p>I am working with Qiskit for programming quantum circuits. Everything works fine but there is one thing which I didn't find out.</p>
+<p>Here is my Python code:</p>
+<pre class=""lang-py prettyprint-override""><code>from qiskit import QuantumCircuit
+
+qc = QuantumCircuit(2)
+
+qc.h(0)
+qc.cx(0, 1)
+
+qc.draw(output = &quot;mpl&quot;)
+</code></pre>
+<p>This is my output:</p>
+<p><a href=""https://i.sstatic.net/VCTUue0t.png"" rel=""nofollow noreferrer""><img src=""https://i.sstatic.net/VCTUue0t.png"" alt=""Quantum Circuit"" /></a></p>
+<p>I am only interested into the graphical representation of the Hadamard gate (red one). I need it for a description. I don't need the wires and the qubits. How can I save the Hadamard gate as png/svg file using Qiskit?</p>
+"
+"78654941","","2024-06-22 02:04:07","2","62","How can I add an ancilla qubit for decompose operation (MultiControlledX) in Pennylane?","<python><quantum-computing><qiskit>","0","<p>I'm trying to make a quantum circuit for a uniform quantum state. Below is the code that constructs the circuit, which works well on the 'default.qubit' device. However, when I try to run this code on real hardware (IBM-Kyoto), I get the following error message:</p>
+<p>ValueError: At least one work wire is required to decompose operation: MultiControlledX
+Output is truncated. View as a scrollable element or open in a text editor. Adjust cell output settings...</p>
+<p>From the error message, I understand that I need to add an ancilla qubit for decomposing the CCCNOT gate into CNOT gates. How can I modify my code to include ancilla qubits for this purpose?</p>
+<p><a href=""https://i.sstatic.net/Hl06IC1O.png"" rel=""nofollow noreferrer"">Quantum Circuit code to run it in IBM hardware</a></p>
+<p>I have add an additional wire(qubit) to the circuit. However when I plot the circuit the additional wire did not appear. So I add an Identity gate to that wire and plotted again. The additional wire appeared to the plot. However this did not solve the problem<a href=""https://i.sstatic.net/iY4DAMj8.png"" rel=""nofollow noreferrer"">Circuit Code with additional wire and Identity matrix applied</a></p>
+<p>The Circuit Code:</p>
+<p>def uqs_ibm(nq: int, shots: int):
+dev = qml.device('qiskit.ibmq', wires=nq+2, shots=shots, backend='ibm_kyoto', ibmqx_token=&quot;XXX&quot;)</p>
+<pre><code>@qml.qnode(dev)
+def circuit():
+    qml.RY(theta_1 * 2, wires=0)
+    
+    for i in range(1, nq):  # Start from 1 since control is 0
+        qml.ctrl(qml.Hadamard(i), (0))
+
+    qml.ctrl(qml.RY, control=(0), control_values=(1))(theta_1, wires=1)
+    
+    
+    for i in range(2, nq):
+        qml.ctrl(qml.Hadamard(i), control=(0, 1), control_values=(0, 1))
+        
+    qml.ctrl(qml.RY, control=(0, 1), control_values=(0, 0))(theta_2, wires=2)
+    
+    qml.ctrl(qml.Hadamard, control=(0, 1, 2), control_values=(0, 0, 1), work_wires=5)(wires=3)
+    qml.ctrl(qml.Hadamard, control=(0, 1, 2), control_values=(0, 0, 1), work_wires=6)(wires=4)
+    
+    return qml.probs(wires=range(nq))  # Return probabilities for all qubits
+
+return circuit
+</code></pre>
+"
+"78628261","","2024-06-16 04:26:59","1","44","Calculating variance of gradient of barren plateau problem in quantum variational circuit","<gradient><gradient-descent><variance><quantum-computing>","0","<p>In paper <a href=""https://arxiv.org/abs/2001.00550"" rel=""nofollow noreferrer"">Cost function dependent barren plateaus in shallow
+parametrized quantum circuits</a>, the author exhibit an warm-up example in page 2 to show the barren plateau phenomenon. In this example, the author presented cost function and global cost function. Then the variance of global gradient is <img src=""https://latex.codecogs.com/svg.image?Var%5B%5Cfrac%7B%5Cpartial&amp;space;C_%7Bg%7D%7D%7B%5Cpartial%5Ctheta%5E%7Bj%7D%7D%5D=%5Cfrac%7B1%7D%7B8%7D*%5Cfrac%7B3%7D%7B8%7D%5E%7Bn-1%7D"" alt=""image"" />. It is pretty confusing to me about getting the result of this variance, can someone please help me with this calculation?</p>
+<p>I have assumed that the variance should be <img src=""https://latex.codecogs.com/svg.image?Var(%5Ctheta)=E(%5Ctheta%5E%7B2%7D)-E%5E%7B2%7D(%5Ctheta)"" alt=""image"" />, and the estimation of x should be <img src=""https://latex.codecogs.com/svg.image?E(x)=%5Cint_%7Ba%7D%5E%7Bb%7Dx*f(x)%5Cmathrm%7Bd%7Dx"" alt=""image"" />, but it is not correct for me to imply these equitions.</p>
+"
+"78449203","78449252","2024-05-08 14:16:45","1","259","ModuleNotFoundError: No module named 'qiskit.monitor'","<python><jupyter><quantum-computing><qiskit>","1","<p>I am trying to run BB84 protocol code on latest Qiskit version 1.0.2 and getting this error.</p>
+<blockquote>
+<p>ModuleNotFoundError: No module named 'qiskit.monitor'</p>
+</blockquote>
+<pre class=""lang-py prettyprint-override""><code>from qiskit import *
+import numpy as np
+from qiskit.visualization import plot_histogram
+from qiskit.monitor import job_monitor
+%matplotlib inline
+from tabulate import tabulate
+</code></pre>
+"
+"78440866","","2024-05-07 07:38:29","1","63","I want to understand the intuition behind oracles and quantum algorithms","<algorithm><quantum-computing>","0","<p>In an oracle for Deutsch Jozsa, we have an input x and y; the output is x and y xor f(x). We apply Hadamard to both the bits at the beginning, but we don't apply it at the end for y qubit. why is that? also, is the purpose of y only reversibility? And how is it that y's output is always y xor f(x)? What is the intuitive explanation behind this?</p>
+<p>I'm just starting with quantum, and until now, it's been all explanatory, but this is confusing me.</p>
+<p><a href=""https://i.sstatic.net/lGARNX29.png"" rel=""nofollow noreferrer"">Oracle</a></p>
+"
+"78420644","","2024-05-02 16:55:40","1","31","Adding ""Bad"" State Oracles to Grover's Algorithm in Qiskit","<quantum-computing><qiskit>","0","<p>I am working on a Grover's algorithm in Qiskit with two oracles. Each oracle marks a different state as &quot;good&quot;. I want to add a few more oracles to mark specific states as &quot;bad&quot;, in order to decrease their probability relative to other states. Could someone advise on how to write such oracles..? Thank you</p>
+<p>Here's my current implementation:</p>
+<pre><code>from qiskit import QuantumCircuit, transpile, execute
+from qiskit_aer import AerSimulator
+import numpy as np
+
+def oracle127(qc):
+    n = 10
+    qc.x([0, 1, 2])
+    qc.mcx([i for i in range(n)], n)
+    qc.x([0, 1, 2])
+    return qc
+
+def oracle896(qc):
+    n = 10
+    qc.x([3, 4, 5, 6, 7, 8, 9])
+    qc.mcx([i for i in range(n)], n)
+    qc.x([3, 4, 5, 6, 7, 8, 9])
+    return qc
+
+def main():
+    n = 10  # Number of qubits
+    qc = QuantumCircuit(n + 1, n)
+    qc.x(n)
+    qc.h(range(n + 1))
+    k = 2  # Number of oracles
+    r = int(np.pi * np.sqrt(2**n/k) / 4)  # Number of iterations
+    for _ in range(r):
+        qc = oracle127(qc)  # Apply first oracle
+        qc = oracle896(qc)  # Apply second oracle
+        # Diffusion operation
+        qc.h(range(n))
+        qc.x(range(n))
+        qc.h(n - 1)
+        qc.mcx([i for i in range(n-1)], n - 1)
+        qc.h(n - 1)
+        qc.x(range(n))
+        qc.h(range(n))
+    qc.measure(range(n), range(n))
+
+    backend = AerSimulator()
+    compiled_circuit = transpile(qc, backend)
+    job = backend.run(compiled_circuit, shots=1000)
+    counts = job.result().get_counts()
+    print(counts)
+
+main()
+</code></pre>
+"
+"78381677","","2024-04-24 23:56:01","2","96","How to interpret a phase kickback in Grover's algorithm","<quantum-computing><grover>","1","<p>For the oracle of Grover's algorithm, there is an explanation that we use a phase-kick back as follows.</p>
+<p>That is, we can tell if f(|x&gt;) is 1 as it will change the output |x&gt;.</p>
+<p><a href=""https://i.sstatic.net/I728Q.png"" rel=""nofollow noreferrer""><img src=""https://i.sstatic.net/I728Q.png"" alt=""enter image description here"" /></a></p>
+<p>My question is,</p>
+<ol>
+<li><p>How can we be sure that the coefficient (-1)^f(x) is attached to |x&gt;, not to the auxiliary bit (|y&gt;)?</p>
+</li>
+<li><p>And why is this interpretation useful? I don't see any use of this auxiliary bit in implementing Grover's algorithm.</p>
+</li>
+</ol>
+<p>I'm looking forward to an answer to the above two questions.</p>
+"
+"78320664","","2024-04-13 13:04:26","2","183","Google Colab Error: ModuleNotFoundError: No module named 'tensorflow_quantum'","<tensorflow><jupyter-notebook><google-colaboratory><quantum-computing><tensorflow-quantum>","1","<p>I am recieveing the error: ModuleNotFoundError: No module named 'tensorflow_quantum' in google colab when i try importing tensorflow-quantum</p>
+<p>I tried installing the package &quot;tensorflow-quantum&quot; over and over again. I also installed it manually by cloning it from github to no avail. Also note that i have read the instructions for installing the package including the python version requirement and followed them to no avail. I tried same process in jupyter-notebook but still get the same error message. Its so frustrating.</p>
+"
+"78305263","","2024-04-10 14:46:38","2","497","PYTHON: Qiskit library import","<python><import><quantum-computing><qiskit>","3","<p>I'm trying to implement old code on qiskit whose imports start with</p>
+<pre><code>from qiskit import QuantumRegister, ClassicalRegister, QuantumCircuit
+from qiskit import BasicAer, execute
+from qiskit.tools.visualization import plot_histogram
+from qiskit.tools.monitor import job_monitor
+from qiskit.providers.ibmq import least_busy
+import cmath
+</code></pre>
+<p>the error comes from the 2nd line</p>
+<blockquote>
+<p>ImportError: cannot import name 'BasicAer' from 'qiskit' (/usr/local/lib/python3.10/dist-packages/qiskit/<strong>init</strong>.py)</p>
+</blockquote>
+<p>I think the problem comes from an old version of qiskit but when I try an old version I have a problem with self &quot;cannot import name 'Self' from 'typing_extensions'.&quot;</p>
+<p>Someone would have any idea ? ty</p>
+<p>I don't have the exact qiskit version of the code I'm trying to implement but the code dates from August 2019</p>
+"
+"78295108","78295509","2024-04-08 21:20:34","3","1504","Qiskit | ImportError: cannot import name 'Aer' from 'qiskit'","<quantum-computing><qiskit>","1","<p>While installing and tried to import Aer, I get an error.</p>
+<pre><code>!pip install qiskit
+
+import numpy as np
+from qiskit import QuantumCircuit, Aer, transpile, assemble
+from qiskit.visualization import plot_histogram
+import random
+</code></pre>
+<p>Any inromation would be highly appreciated.</p>
+<p><a href=""https://i.sstatic.net/92hrw.png"" rel=""nofollow noreferrer""><img src=""https://i.sstatic.net/92hrw.png"" alt=""enter image description here"" /></a></p>
+"
+"78270277","","2024-04-03 20:10:35","4","354","Confusion in Qiskit to generate Bell states","<quantum-computing><qiskit><post-quantum-cryptography>","2","<p>I want to generate the bell state $(|01\rangle+|10\rangle)/\sqrt{2}$ from the state $|00\rangle$ in qiskit applying the Hadamard gate followed by the CNOT gate. But it generates $(|11\rangle-|00\rangle)/\sqrt{2}$. What is the problem?</p>
+<p>This is my code.</p>
+<pre class=""lang-py prettyprint-override""><code>sv1 = Statevector.from_label('01')
+mycircuit1 = QuantumCircuit(2)
+mycircuit1.h(0)
+mycircuit1.cx(0,1)
+new_sv1 = sv1.evolve(mycircuit1)
+print(new_sv1)
+plot_state_qsphere(new_sv1.data)
+</code></pre>
+"
+"78268696","","2024-04-03 15:18:00","1","71","Quantum Computing implementation","<neural-network><quantum-computing><activation-function><qiskit>","0","<p>I am trying to implement a quantum algorithm written in an research paper. The layout is a linear layer , followed by an quantum activation function layer and then a layer of softmax. This is my current code of the model and layer implementation</p>
+<pre><code>`
+</code></pre>
+<pre><code>import numpy as np
+    from qiskit import QuantumCircuit, transpile, assemble
+    from qiskit_aer import Aer
+    from tensorflow.keras.layers import Layer
+    class QuantumActivationFunction(Layer):
+        def __init__(self, num_features, output_size, **kwargs):
+            super(QuantumActivationFunction, self).__init__(**kwargs)
+            self.num_features =8
+            self.output_size = 8
+        
+        def encode_data_to_qubits(self, data):
+            # Implement the encoding of data to qubits
+            num_samples, num_features = data.shape
+            encoded_states = []
+
+            for i in range(num_samples):
+                x = data[i]
+                qc = QuantumCircuit(num_features)
+                for j in range(num_features):
+                    angle_1 = np.arctan(x[j])
+                    angle_2 = np.arctan(x[j] ** 2)
+                    qc.h(j)
+                    qc.ry(angle_1, j)
+                    qc.rz(angle_2, j)
+                encoded_states.append(qc)
+            return encoded_states
+
+        def entangle_qubits(self, qc):
+            # Implement qubit entanglement
+            num_qubits = qc.num_qubits
+            for stride in range(1, num_qubits):
+                for i in range(num_qubits):
+                    control_qubit = qc.qubits[i]
+                    target_qubit = qc.qubits[(i+stride)%8]
+                    qc.cx(control_qubit, target_qubit)
+            
+        def compute_r(qc):
+            r = [0] * 4
+            for i in range(4):
+                r[i] = qc.rz(np.pi,qc.qubits[i])
+            return r
+                
+        # def build(self, input_shape):
+        #     # Define any trainable parameters here
+        #     self._input_shape = input_shape
+        #     pass
+
+        def call(self, data):
+            # Implement the activation function logic here
+            # For example, you can use the inputs to compute the quantum activation
+            # return tf.nn.relu(inputs)  # Placeholder example, replace with your quantum activation function logi
+            encoded_states = self.encode_data_to_qubits(data)
+            for qc in encoded_states:
+                self.entangle_qubits(qc)
+                self.compute_r(qc)
+            return encoded_states
+                    
+
+        # def compute_output_shape(self, input_shape):
+        #      #Return the shape of the output tensor
+        #      return (input_shape[0], self.output_size)
+
+    from keras.layers import Activation
+    from keras.activations import softmax
+
+    def baseline_model():
+        model = Sequential()
+        model.add(Dense(8, input_dim=374, activation='linear'))  # Linear layer
+        model.add(QuantumActivationFunction(8,8))  # Quantum Activation Function layer
+        model.add(Dense(3, activation='softmax'))  # Output layer
+        model.compile(loss='categorical_crossentropy', optimizer='adam', metrics=['accuracy'])
+        return model
+</code></pre>
+<pre><code>The code is returning error :
+`TypeError                                 Traceback (most recent call last)
+Cell In[105], line 1
+----&gt; 1 model = baseline_model()
+      2 first_linear_layer_output = model.layers[0](X_train).numpy()
+      4 print(&quot;Output of the first linear layer:&quot;, first_linear_layer_output)
+
+Cell In[104], line 7
+      5 model = Sequential()
+      6 model.add(Dense(8, input_dim=374, activation='linear'))  # Linear layer
+----&gt; 7 model.add(QuantumActivationFunction(8,8))  # Quantum Activation Function layer
+      8 model.add(Dense(3, activation='softmax'))  # Output layer
+      9 model.compile(loss='categorical_crossentropy', optimizer='adam', metrics=['accuracy'])
+
+File ~\AppData\Roaming\Python\Python311\site-packages\tensorflow\python\trackable\base.py:205, in no_automatic_dependency_tracking.&lt;locals&gt;._method_wrapper(self, *args, **kwargs)
+    203 self._self_setattr_tracking = False  # pylint: disable=protected-access
+    204 try:
+--&gt; 205   result = method(self, *args, **kwargs)
+    206 finally:`your text`
+    207   self._self_setattr_tracking = previous_value  # pylint: disable=protected-access
+
+File c:\Python311\Lib\site-packages\keras\utils\traceback_utils.py:70, in filter_traceback.&lt;locals&gt;.error_handler(*args, **kwargs)
+     67     filtered_tb = _process_traceback_frames(e.__traceback`
+</code></pre>
+<p>I have tried rechecking my code several times, I have even checked dimensions of my data but still the error persists. When I was running the functions of quantum layer separately , it was working fine but after integrating it into class , it showed again the same error.
+Sincere request to everyone who can help</p>
+"
+"78215304","","2024-03-24 16:40:25","4","395","Cannot import qiskit_algorithms on Amazon Braket note book","<amazon-web-services><quantum-computing><qiskit>","2","<p>I was going to use Braket in us-east1.
+I wanted to use qiskit, so I wanted to import the module, but an error occurred.</p>
+<p>I referred to the following URL
+<a href=""https://qiskit-community.github.io/qiskit-braket-provider/tutorials/3_tutorial_minimum_eigen_optimizer.html"" rel=""nofollow noreferrer"">https://qiskit-community.github.io/qiskit-braket-provider/tutorials/3_tutorial_minimum_eigen_optimizer.html</a></p>
+<p>Checking with !pip list, qiskit_algorithms is installed without any problem.</p>
+<p>【code】</p>
+<pre><code>!pip install qiskit
+!pip install qiskit-optimization
+!pip install qiskit-algorithms
+
+from qiskit import QuantumCircuit, transpile
+from qiskit.quantum_info import SparsePauliOp
+from qiskit.primitives import Sampler
+from qiskit_aer import AerSimulator
+from qiskit_optimization import QuadraticProgram
+from qiskit_algorithms.minimum_eigensolvers import QAOA
+from qiskit_algorithms.optimizers import COBYLA
+from qiskit_algorithms import NumPyMinimumEigensolver
+from qiskit_optimization.algorithms import MinimumEigenOptimizer
+</code></pre>
+<p>【output】</p>
+<pre><code>ModuleNotFoundError                       Traceback (most recent call last)
+Cell In[7], line 10
+      4 from qiskit_aer import AerSimulator
+      5 # from qiskit_optimization import QuadraticProgram
+      6 # from qiskit_algorithms.minimum_eigensolvers import QAOA
+      7 # from qiskit_algorithms.optimizers import COBYLA
+      8 # from qiskit_algorithms import NumPyMinimumEigensolver
+      9 # from qiskit_optimization.algorithms import MinimumEigenOptimizer
+---&gt; 10 import qiskit_optimization
+
+ModuleNotFoundError: No module named 'qiskit_optimization'
+</code></pre>
+<p>How can I install qiskit_algorithms and qiskit_optimization without problems?</p>
+<p>I have tried the following.</p>
+<ul>
+<li>Verify that the module is installed with a !pip list</li>
+<li>Restart kernel</li>
+<li>Start another notebook</li>
+<li>Verify that the installed path of the package is correct</li>
+<li>Confirm that the module works fine in the local environment</li>
+</ul>
+"
+"78180575","78180576","2024-03-18 12:59:37","4","367","Can't import Aer from Qiskit","<quantum-computing><qiskit>","1","<p>When running the following code:</p>
+<pre class=""lang-python prettyprint-override""><code>from qiskit import Aer
+</code></pre>
+<p>I encountered the following error:</p>
+<pre><code>ImportError
+Traceback (most recent call last)
+Cell In[50], line 1
+----&gt; 1 from qiskit import Aer
+
+ImportError: cannot import name 'Aer' from 'qiskit'
+</code></pre>
+<p>Why is that the case?</p>
+"
+"78161659","","2024-03-14 15:33:49","5","1508","Error importing Qiskit Aer when running Qiskit","<python><quantum-computing><qiskit>","3","<p>I am getting an error when I try to import Aer in Qiskit. I am running this command:</p>
+<pre><code>from qiskit import Aer
+</code></pre>
+<p>And I am getting this error:</p>
+<pre><code>cannot import name 'aer' from 'qiskit' (/opt/conda/lib/python3.10/site-packages/qiskit/__init__.py)
+
+Use %tb to get the full traceback.
+</code></pre>
+<p>I have tried to solve this by reinstalling with <code>pip install qiskit-aer</code>, as well as restarting the kernel, uninstalling and reinstalling Qiskit, etc. Note that I'm working in IBM Quantum Lab.</p>
+"
+"78078780","","2024-02-29 03:54:44","1","72","Is there a command to review queue length for an IonQ job?","<quantum-computing><qiskit>","1","<p>When running jobs on IonQ I notice that there's a lot of variation in the running time. sometimes it's almost instant, sometimes hours. Is there a method to preview the job waiting time or queue before I submit a job, or review it while a job is waiting? In this case I'm using qiskit on the front end.</p>
+"
+"78072194","","2024-02-28 05:56:13","4","197","Getting memory information from Qiskit Runtime service- Sampler","<memory><runtime><quantum-computing><qiskit><sample-rate>","1","<p>I'm working on a QRNG program where I need to get the memory information properly. But having made changes to the IBM qiskit packages, it seems there is no option to get the memory from the sampler. How do I solve this issue?</p>
+<p>I tried giving 'memory=True' inside the backend initialization and sampler run. But that is not available now.</p>
+"
+"78070652","","2024-02-27 21:25:27","1","53","How to enable NVIDIA cuQuantum QPU access in qBraid?","<quantum-computing><qbraid>","1","<p>I'm currently using the default Jupyter instances for qBraid, and looking to try some jobs on a GPU. I see that qBraid has access to a configured GPU rig, and offers this as a service, but it's not clear how to access this.</p>
+<p>What is the process for moving my job into the qBraid GPU?</p>
+"
+"78054815","","2024-02-25 04:11:20","1","48","Packages not persisting in Julia config on qBraid","<quantum-computing><qbraid>","1","<p>Have successfully run the Julia packages in the qBraid Lab IDE. Now looking to persist the configuration, which seems to reset every time I run a new session. Is there a method for persistance?</p>
+<p>Tried running the qBraid Lab IDE config with Julia packages but they reset after each session.</p>
+"
+"78050570","78050588","2024-02-23 22:52:58","1","39","Dockerfile for Qristal: what should be the value of $QB_DIR","<quantum-computing><qristal-sdk>","1","<p>When cloning the <a href=""https://github.com/qbrilliance/qristal"" rel=""nofollow noreferrer"">Qristal repository</a> and trying to build the Docker image with <code>docker/Dockerfile</code>, what is an appropriate setting for <code>$QB_DIR</code> that is on line 27 of the Dockerfile:</p>
+<pre><code>WORKDIR $QB_DIR
+</code></pre>
+"
+"78035827","78038885","2024-02-21 17:05:27","3","55","is it possible to evaluate a function of matrix variables in mathematica?","<function><matrix><linear-algebra><wolfram-mathematica><quantum-computing>","1","<p>Let for a matrix X of 3*3 dimension,
+first I need to find the eigenvectors of it,
+<code>A = Eigenvectors[X];</code>
+Then I need to express one of its eigen vector in matrix form,
+Lets write its 2nd eigenvector
+<code>B = A[[2 ;; 2, 1 ;; 3]];</code>
+Now I need to evaluvate
+<code>C = ConjugateTranspose[B].B;</code>
+Then i need to evaluvate,
+<code>D = C/Norm[C];</code></p>
+<p>I need to find this for different X, is it possible to write a single function for this?</p>
+<p>Can i write code like this</p>
+<p><code>A[X_] := Eigenvectors[X]; B[u_] := A[[2 ;; 2, 1 ;; 3]]; C[y_] := ConjugateTranspose[B].B; D[t_] := C/Norm[C];</code></p>
+<p>and if i need to evaluate the whole thing for a matrix g</p>
+<p><code>D[C[B[A[g]]]]</code></p>
+"
+"78027912","78030350","2024-02-20 13:56:25","6","15076","Unable to import execute function from qiskit library","<quantum-computing><qiskit>","4","<p><a href=""https://i.sstatic.net/ucC3m.png"" rel=""noreferrer""><img src=""https://i.sstatic.net/ucC3m.png"" alt=""enter image description here"" /></a></p>
+<p>when I try to run this code, it gives me and error that it was unable to import <code>execute</code> from <code>qiskit</code> (error pasted below).</p>
+<pre><code>2 get_ipython().system('pip install --upgrade qiskit qiskit-aer')
+      3 import qiskit
+----&gt; 4 from qiskit import QuantumCircuit, execute
+      5 from qiskit_aer import Aer
+      6 from qiskit.visualization import plot_histogram
+
+ImportError: cannot import name 'execute' from 'qiskit' (/usr/local/lib/python3.10/dist-packages/qiskit/__init__.py)
+</code></pre>
+<p>I have tried upgrading <code>qiskit</code> which didn't work. I have also tried using transpile and the other functions but it changed my code too much and I didn't want that to happen.</p>
+"
+"78024936","","2024-02-20 05:23:00","2","84","How can I find and select the quantum backends available in qbraid?","<quantum-computing><qiskit><qbraid>","1","<p>I'm using a qiskit tutorial for qbraid which is a basic hello world. I see that there is the possibility to use other quantum backends rather than qiskit, but there's not a clear path for this in the UI.</p>
+<p>Is there a command line or direct way to search the API for other backends?</p>
+"
+"77948274","","2024-02-06 14:02:13","1","35","Quantum Gate uses in Deep Learning","<tensorflow><deep-learning><quantum-computing><tensorflow-quantum>","1","<p>I am working on a hybrid classical-quantum model in deep learning. I do not understand the use of hadamard gate and CNOT gate in the quantum training layer. The code uses Hadamard Layer, CNOT layer and Rotational encoding.</p>
+<p>Here is the code</p>
+<pre><code>def H_layer(nqubits):
+    &quot;&quot;&quot;Layer of single-qubit Hadamard gates.
+    &quot;&quot;&quot;
+    for idx in range(nqubits):
+        qml.Hadamard(wires=idx)
+
+def RY_layer(w):
+    &quot;&quot;&quot;Layer of parametrized qubit rotations around the y axis.
+    &quot;&quot;&quot;
+    for idx, element in enumerate(w):
+        qml.RY(element, wires=idx)
+
+def entangling_layer(nqubits):
+    &quot;&quot;&quot;Layer of CNOTs followed by another shifted layer of CNOT.
+    &quot;&quot;&quot;
+    # In other words it should apply something like :
+    #CNOT  CNOT  CNOT  CNOT...  CNOT
+    #   CNOT  CNOT  CNOT...  CNOT
+    for i in range(0, nqubits - 1, 2): #loop over even indices: i=0,2,...N-2
+        qml.CNOT(wires=[i, i + 1])
+    for i in range(1, nqubits - 1, 2): #loop over odd indices:  i=1,3,...N-3
+        qml.CNOT(wires=[i, i + 1])  
+</code></pre>
+<p>Why is the code using hadamrad gate and CNOT gate?</p>
+"
+"77932318","","2024-02-03 13:46:17","5","204","Is there a function to call the estimated waiting time for a Job on the IBM Quantum Platform?","<quantum-computing><qiskit>","1","<p>I was trying to write a script that obtains current Information about a Job on the IBM Quantum Platform using Qiskit.</p>
+<p>I managed to call the current status with the JobID, but it seems, like there is no function or API call that makes it possible to display the current estimated waiting time for the Job.</p>
+<p>In addition, although I managed to gather the information about the current status of the Job (e.g. queued) the output I get is NONE, maybe we can manage to fix this aswell.</p>
+<p>Can anybody help me out?</p>
+<p>I tried including a function to call the estimated waiting time, but it seems, that there is no API call.</p>
+"
+"77475720","","2023-11-13 17:25:51","2","234","How can i set rep_delay in ibm qiskit runtime","<primitive><quantum-computing><qiskit>","1","<p>I want to be able to speed up the sampling done by qiskit_ibm_runtime.Estimator, by reducing the time qubits are allowed to decay to their ground state. I realise this might introduce errors in the intial state but it may help me to estimate the possible sampling speed if error rates were not my priority, or if error rate improved with QPU developments.
+When not using qiskit runtime the rep_delay can be set when running a back end</p>
+<pre><code>from qiskit.circuit.library import RealAmplitudes
+circuit = RealAmplitudes(num_qubits=2, reps=2)
+backend.run(circuit, rep_delay=0.00001)
+</code></pre>
+<p>Can a this delay be set when using the primitive Estimator or Sampler? I tried</p>
+<pre><code>from qiskit_ibm_runtime import Estimator, Session, QiskitRuntimeService
+from qiskit.circuit.library import RealAmplitudes
+circuit = RealAmplitudes(num_qubits=2, reps=2)
+service = QiskitRuntimeService(channel=&quot;ibm_cloud&quot;, token=API_Key_my, instance=crn_pay)
+
+backend={0:&quot;ibm_algiers&quot;,1:&quot;ibmq_qasm_simulator&quot;,2:&quot;ibmq_manila&quot;}[0]
+    with Session(service=service, backend=backend):
+        job = qiskit_ibm_runtime.Sampler(options={&quot;shots&quot;: 2048} ).run(circuit, rep_delay=0.00001)
+</code></pre>
+<p>but it responded with error</p>
+<pre><code>got an unexpected keyword argument 'rep_delay'
+</code></pre>
+"
+"77451506","77451755","2023-11-09 08:21:55","1","448","Some classical bits are not used for measurements. the number of classical bits (2), the used classical bits (set())","<quantum-computing><qiskit>","1","<p>I am looking to work with loops in quantum computing, but when I run my circuit I get this error: <strong>Some classical bits are not used for measurements. the number of classical bits (2), the used classical bits (set()).</strong></p>
+<pre><code>qubits = QuantumRegister(1)
+clbits = ClassicalRegister(1)
+circuit = QuantumCircuit(qubits, clbits)
+(q0,) = qubits
+(c0,) = clbits
+ 
+with circuit.for_loop(range(5)) as _:
+    circuit.x(q0)
+circuit.measure(q0, c0)
+circuit.draw(&quot;mpl&quot;)
+
+result = Sampler().run(circuit).result()
+result.quasi_dists[0] 
+# example output counts: {'1': 1024}
+</code></pre>
+<p><em>QiskitError: 'Some classical bits are not used for measurements. the number of classical bits (2), the used classical bits (set()).'</em></p>
+"
+"77430751","","2023-11-06 11:30:41","1","68","Retrieving result attributes in Qiskit","<quantum-computing><qiskit>","0","<p>I am trying to optimize a Hamiltonian using QAOA in IBM Qiskit.</p>
+<p>I used the following 'minimize' function to get my result. (I am not including the whole code because it will get unnecessarily long).</p>
+<pre><code>   res = minimize(cost_func, x0, args=(ansatz, hamiltonian, estimator), method=&quot;COBYLA&quot;)
+   res 
+</code></pre>
+<p>When I ran the problem on a 'ibmq qasm simulator' I got the following result:</p>
+<pre><code>fun: -23.1424
+   maxcv: 0.0
+ message: 'Optimization terminated successfully.'
+    nfev: 45
+  status: 1
+ success: True
+       x: array([3.39824022, 4.17447906, 2.86297948, 3.1139919 ])
+</code></pre>
+<p>I got multiple attributes in the solution.</p>
+<p>But when I ran this on an actual quantum computer (ibm brisbane), I used the same code and same variable 'res'; it went on Queue and I had to wait for around 4-5 hours. But after the job was done, I cannot get the value for res which was defined in the previous line of code.</p>
+<pre><code>Traceback (most recent call last):
+  Cell In[1], line 1
+    res
+NameError: name 'res' is not defined
+</code></pre>
+<p>And I tried using job.result() but that doesn't have the required attributes I got from the results of the simulator stored in variable 'res'.</p>
+<p>How can I get the attributes such as res.x from the already completed job?</p>
+"
+"77381503","77451603","2023-10-28 22:57:01","1","331","How to run the multiple circuits in a single Job of IBM Backed?","<quantum-computing><qiskit>","1","<p>I aim to run multiple circuits using a single instance of the IBMBacked class. Due to the significant number of queued jobs on the IBM Cloud, executing individual circuits and waiting for their results for extended periods has proven challenging. To address this, I aim to consolidate the execution of 10 or 20 circuits into a single job, which can then be submitted to the IBM Cloud instance to receive consolidated results. But I am facing the issue of how to do this and every time I get an error.</p>
+<p>I have included a code sample and details of any associated errors for your reference.</p>
+<pre><code>def circuit():
+    
+    qr = QuantumRegister(2)
+    cr = ClassicalRegister(2)
+    circuit = QuantumCircuit(qr,cr)
+    circuit.x(qr[1])
+    circuit.x(qr[0]).c_if(cr, 1) # c_if(cr, 2)  mean Cr= 010 if a&lt;b
+    circuit.x(qr[0])
+    circuit.measure(0,0)
+    circuit.measure(1,1)             
+    return  circuit
+
+
+hub = &quot;ibm-q&quot;
+group = &quot;open&quot;
+project = &quot;main&quot;
+backend_name = &quot;ibm_brisbane&quot;
+hgp = f&quot;{hub}/{group}/{project}&quot;
+provider = IBMProvider()
+backend = provider.get_backend(backend_name, instance=hgp)
+
+qc_transpiled1 = transpile(circuit(), backend)
+qc_transpiled2= transpile(circuit(), backend)
+qc_transpiled3 = transpile(circuit(), backend)
+
+circuits=(qc_transpiled1,qc_transpiled2,qc_transpiled3,)
+job = backend.run(circuits, shots=1024,  dynamic=True)
+</code></pre>
+<p>Error:</p>
+<p><a href=""https://i.sstatic.net/egJXX.png"" rel=""nofollow noreferrer""><img src=""https://i.sstatic.net/egJXX.png"" alt=""enter image description here"" /></a></p>
+"
+"76939147","76939486","2023-08-20 11:23:43","1","2774","Keep receiving Error - AttributeError: 'QuantumCircuit' object has no attribute 'u3'","<quantum-computing><qiskit>","1","<p>I am attempting to code a NOT gate on Qiskit and I keep receiving the error. I am not sure what to fix as I also want to run Quantum Battleships with partial NOT gates and it involves the same code.</p>
+<pre><code>q = QuantumRegister(1)
+c = ClassicalRegister(1)
+qc = QuantumCircuit(q,c)
+
+qc.u3(math.pi,0,0, q[0])
+qc.measure( q[0], c[0])
+</code></pre>
+<p>This was the main code and I get the following error:</p>
+<pre><code>AttributeError                            Traceback (most recent call last)
+Cell In[4], line 5
+      2 c = ClassicalRegister(1)
+      3 qc = QuantumCircuit(q,c)
+----&gt; 5 qc.u3(math.pi,0,0, q[0])
+      6 qc.measure( q[0], c[0])
+
+AttributeError: 'QuantumCircuit' object has no attribute 'u3'
+</code></pre>
+<p>I tried to install programs that I thought I may have needed but I do not think I installed the right one.</p>
+"
+"76934656","77073172","2023-08-19 10:31:03","1","179","How to Calculate the Quantum Cost of Qiskit Circuit","<python><quantum-computing><qiskit>","1","<p>I want to calculate the Quantum cost of this qiskit circuit, e.g as i know x-gate has the cost 1 and there are 4 x-gate so quantum cost for x-gate will be 4. What about ccx gate? How can i calculate its cost.?</p>
+<pre><code>    circuit.x(qr[1])
+    circuit.x(qr[0])
+    circuit.ccx(qr[0], qr[1], qr[2])
+    circuit.x(qr[1])
+    circuit.x(qr[0])
+    circuit.ccx(qr[0], qr[1], qr[3])
+</code></pre>
+"
+"76811770","","2023-08-01 12:46:10","1","76","Wrong function picked during compilation","<c++><quantum-computing>","0","<p>I think this is a duplicated question as it is plenty of examples where users experience the picking of wrong function with the same name and different arguments by the compiler, but I am using an extarnal library that I am not allowed to modify, so I have to figure out how to solve this problem as a user.</p>
+<p>I am using the Quantum++ library to simulate quantum circuits. It is header only. It has this class called <code>QCircuit</code> which has two methods with the same name, same number of arguments but different types:</p>
+<pre><code>QCircuit&amp; CTRL_fan(const cmat&amp; U,
+                       idx ctrl,
+                       const std::vector&lt;idx&gt;&amp; target,
+                       std::optional&lt;idx&gt; shift = std::nullopt,
+                       std::optional&lt;std::string&gt; name = std::nullopt)
+</code></pre>
+<p>and</p>
+<pre><code>QCircuit&amp; CTRL_fan(const cmat&amp; U,
+                       const std::vector&lt;idx&gt;&amp; ctrl,
+                       const std::vector&lt;idx&gt;&amp; target,
+                       std::optional&lt;std::vector&lt;idx&gt;&gt; shift = std::nullopt,
+                       std::optional&lt;std::string&gt; name = std::nullopt)
+</code></pre>
+<p>I need to pick the second one in the following code:</p>
+<pre><code>    qpp::QCircuit qcirc(5);
+    std::vector&lt;int&gt; ancilla = {0,1};
+    std::vector&lt;int&gt; reg = {3,4};
+    qcirc.CTRL_fan(qpp::gt.RY(0.3), ancilla, reg);
+</code></pre>
+<p>With this code, the compiler is picking the first function. Even VScode intellisense is complaining. Actually I even tried to modify the code inside Quantum++ but it did not work either (of course I cannot change the name to avoid the modification of the entire library).</p>
+<p>The error message:</p>
+<pre><code>src/ansatz.cpp: In member function ‘void satoAnsatz::addToCircuit(qpp::QCircuit&amp;, bool)’:
+src/ansatz.cpp:36:19: error: no matching function for call to ‘qpp::QCircuit::CTRL_fan(qpp::cmat, std::vector&lt;int&gt;&amp;, std::vector&lt;int&gt;&amp;)’
+   36 |     qcirc.CTRL_fan(qpp::gt.RY(0.3), ancilla, reg);
+      |     ~~~~~~~~~~~~~~^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+In file included from include/qpp.h:149,
+                 from src/ansatz.hpp:7,
+                 from src/ansatz.cpp:1:
+include/classes/circuits/circuits.hpp:2092:15: note: candidate: ‘qpp::QCircuit&amp; qpp::QCircuit::CTRL_fan(const cmat&amp;, qpp::idx, const std::vector&lt;long unsigned int&gt;&amp;, std::optional&lt;long unsigned int&gt;, std::optional&lt;std::__cxx11::basic_string&lt;char&gt; &gt;)’
+ 2092 |     QCircuit&amp; CTRL_fan(const cmat&amp; U, idx ctrl, const std::vector&lt;idx&gt;&amp; target,
+      |               ^~~~~~~~
+include/classes/circuits/circuits.hpp:2092:43: note:   no known conversion for argument 2 from ‘std::vector&lt;int&gt;’ to ‘qpp::idx’ {aka  long unsigned int’}
+ 2092 |     QCircuit&amp; CTRL_fan(const cmat&amp; U, idx ctrl, const std::vector&lt;idx&gt;&amp; target,
+      |                                       ~~~~^~~~
+include/classes/circuits/circuits.hpp:2190:15: note: candidate: ‘qpp::QCircuit&amp; qpp::QCircuit::CTRL_fan(const cmat&amp;, const std::vector&lt;long unsigned int&gt;&amp;, const std::vector&lt;long unsigned int&gt;&amp;, std::optional&lt;std::vector&lt;long unsigned int&gt; &gt;, std::optional&lt;std::__cxx11::basic_string&lt;char&gt; &gt;)’
+ 2190 |     QCircuit&amp; CTRL_fan(const cmat&amp; U, const std::vector&lt;idx&gt;&amp; ctrl,
+      |               ^~~~~~~~
+include/classes/circuits/circuits.hpp:2190:63: note:   no known conversion for argument 2 from ‘std::vector&lt;int&gt;’ to ‘const std::vector&lt;long unsigned int&gt;&amp;’
+ 2190 |     QCircuit&amp; CTRL_fan(const cmat&amp; U, const std::vector&lt;idx&gt;&amp; ctrl,
+
+</code></pre>
+"
+"76789850","","2023-07-28 17:15:12","1","270","Converting Classical Images to Quantum Images using INEQR Technique: Feasibility and Python Implementation?","<python><image-processing><quantum-computing>","1","<p>How to convert a classical image into a quantum image using the INEQR technique? and is it possible using Python?</p>
+<p>I'm facing difficulties to convert a classical image into a quantum image.so, I'm expecting some suggestions, on how to convert a classical image into a quantum image and whether is it possible to use Python or not. if possible need the Python implementation code,</p>
+"
+"76536899","","2023-06-23 03:19:37","1","65","How to define the number of times to run a circuit in Qristal SDK?","<quantum-computing><qristal-sdk>","1","<p>I've been starting to create a quantum application using the Qristal SDK. I've gotten it running in a Docker image and successfully printed results from using a <code>qpp</code> back end with a kind of hello world count exercise (trying to see that it does in fact run the algo and return results expected in a quantum query).</p>
+<p>What I am having trouble with is how to get this to run at scale. Do I need to continually run the application (as a quantum circuit) over time, or can I scale the qubits being emulated to account for a greater or more accurate outcome?</p>
+<p>Here's is the circuit that I've tried.</p>
+<pre><code>my_sim.instring = '''
+__qpu__ void QUANTUMPROGRAM(qreg q)
+{
+  OPENQASM 2.0;
+  include &quot;qelib1.inc&quot;;
+  creg c[2];
+  h q[0];
+  cx q[0], q[1];
+  measure q[1] -&gt; c[1];
+  measure q[0] -&gt; c[0];
+}
+'''
+
+</code></pre>
+"
+"76371779","76427971","2023-05-31 08:58:32","5","271","Calculating CHSH inequality violation in a two-qubit system with projective measurements","<quantum-computing>","1","<p>Suppose a two-qubit system is in the state |Φ⟩ = (|00⟩ + |11⟩ )/ √2. Consider projective measurements with outcome ±1. Calculate the maximal violation of the CHSH inequality and find the measurement setting that can result the maximal violation.</p>
+<p>I am new to quantum computing.I don't know how to solve this problem.</p>
+"
+"76369957","76370993","2023-05-31 03:22:04","2","816","Resolving deprecation warnings of Qiskit's `QuantumInstance`","<python><jupyter-lab><quantum-computing><qiskit>","1","<p>This code finds the solution to the Max-Cut problem for a given graph using both classical and quantum algorithms. The Max-Cut problem is a well-known problem in computer science and combinatorial optimization, which seeks to divide the vertices of a graph into two disjoint sets such that the number of edges between the sets is maximized.</p>
+<p>Here's a detailed breakdown of what the code does:</p>
+<p>It first defines a graph with nodes connected by certain edges. In this case, the graph has three nodes (0, 1, 2) with edges between all pairs of nodes.</p>
+<p>It then creates an instance of the Max-Cut problem for this graph.</p>
+<p>This Max-Cut problem is converted into a Quadratic Program (QP). Quadratic Programs are a type of mathematical optimization problem that can be solved by certain algorithms. They are useful in the context of quantum computing because many optimization problems can be converted into QPs, which can then be solved on a quantum computer.</p>
+<p>The code then solves the Quadratic Program using a classical algorithm called the Minimum Eigenvalue Solver (NumPyMinimumEigensolver). This is an exact method for finding the minimum eigenvalue of a matrix, which corresponds to the optimal solution of the QP. The solution is then printed to the console.</p>
+<p>Next, the code solves the same Quadratic Program using the Quantum Approximate Optimization Algorithm (QAOA), a quantum algorithm designed for solving combinatorial optimization problems. This is done using a quantum simulator (in this case, the statevector_simulator from Qiskit's Aer module) and the COBYLA optimizer.</p>
+<p>Finally, the quantum solution to the problem is printed to the console.</p>
+<p>In summary, this code is demonstrating how to solve the Max-Cut problem for a simple graph using both classical and quantum methods, and how to compare their results.</p>
+<p>however it seems i get the deprecated warning. i know there is links to find the migration but i cant figure out how to get rid of it</p>
+<pre><code>import networkx as nx
+from qiskit import Aer
+from qiskit.algorithms import QAOA, NumPyMinimumEigensolver
+from qiskit.algorithms.optimizers import COBYLA
+from qiskit_optimization import QuadraticProgram
+from qiskit_optimization.algorithms import MinimumEigenOptimizer
+from qiskit_optimization.applications import Maxcut
+from qiskit.utils import QuantumInstance
+
+# Define the edges of the graph (edges are represented by tuples of node indices)
+edges = [(0, 1), (0, 2), (1, 2)]
+
+# Create a graph based on these edges
+G = nx.Graph(edges)
+
+# Create the Maxcut object
+maxcut = Maxcut(G)
+
+# Create a QuadraticProgram based on maxcut
+qp = maxcut.to_quadratic_program()
+
+# Solve the problem exactly using classical eigensolver
+exact_mes = NumPyMinimumEigensolver()
+exact = MinimumEigenOptimizer(exact_mes)
+result = exact.solve(qp)
+print(&quot;Exact solution:\n&quot;, result)
+
+# Solve the problem using QAOA
+quantum_instance = QuantumInstance(Aer.get_backend('statevector_simulator'))
+qaoa_mes = QAOA(optimizer=COBYLA(), quantum_instance=quantum_instance)
+qaoa = MinimumEigenOptimizer(qaoa_mes)
+result = qaoa.solve(qp)
+print(&quot;QAOA solution:\n&quot;, result)
+</code></pre>
+<pre><code>C:\Users\Local\Temp\ipykernel_7204\1113091964.py:23: DeprecationWarning: The class ``qiskit.algorithms.minimum_eigen_solvers.numpy_minimum_eigen_solver.NumPyMinimumEigensolver`` is deprecated as of qiskit-terra 0.24.0. It will be removed no earlier than 3 months after the release date. Instead, use the class ``qiskit.algorithms.minimum_eigensolvers.NumPyMinimumEigensolver``. See https://qisk.it/algo_migration for a migration guide.
+  exact_mes = NumPyMinimumEigensolver()
+C:\Users\AppData\Local\Temp\ipykernel_7204\1113091964.py:29: DeprecationWarning: The class ``qiskit.utils.quantum_instance.QuantumInstance`` is deprecated as of qiskit-terra 0.24.0. It will be removed no earlier than 3 months after the release date. For code migration guidelines, visit https://qisk.it/qi_migration.
+  quantum_instance = QuantumInstance(Aer.get_backend('statevector_simulator'))
+C:\Users\AppData\Local\Temp\ipykernel_7204\1113091964.py:30: DeprecationWarning: The class ``qiskit.algorithms.minimum_eigen_solvers.qaoa.QAOA`` is deprecated as of qiskit-terra 0.24.0. It will be removed no earlier than 3 months after the release date. Instead, use the class ``qiskit.algorithms.minimum_eigensolvers.QAOA``. See https://qisk.it/algo_migration for a migration guide.
+  qaoa_mes = QAOA(optimizer=COBYLA(), quantum_instance=quantum_instance)
+
+Exact solution:
+ fval=2.0, x_0=1.0, x_1=0.0, x_2=0.0, status=SUCCESS
+QAOA solution:
+ fval=2.0, x_0=1.0, x_1=0.0, x_2=0.0, status=SUCCESS
+</code></pre>
+"
+"76030148","","2023-04-16 20:24:33","2","297","Quantum Fourier Transformation Qiskit implementation","<python><quantum-computing>","0","<p>I tried to work the Qiskit implementation using python3</p>
+<pre><code>AttributeError: 'QuantumCircuit' object has no attribute 'cu1'
+</code></pre>
+<p>is the error message</p>
+<pre><code>import matplotlib.pyplot as plt
+%matplotlib inline
+import numpy as np
+from math import pi
+from qiskit import *
+</code></pre>
+"
+"75996453","","2023-04-12 14:07:33","3","136","CUDA Quantum code built with multiGPU support flag works as single with multiple GPU assigned","<nvidia><multi-gpu><quantum-computing>","1","<p>I am evaluating CUDA Quantum; the goal is to build and run code with multi-GPU support
+on an HPC system. I use CUDA Quantum via the official container image and using Nvidia <code>enroot</code> as container engine.</p>
+<p>I build as follow with no errors:</p>
+<pre class=""lang-bash prettyprint-override""><code>nvq++ cuquantum_backends.cpp -o cuquantum_backends.x --qpu cuquantum --platform mqpu 
+</code></pre>
+<p>as shown in the last GTC talk: &quot;Inside CUDA Quantum&quot; (<a href=""https://www.nvidia.com/en-us/on-demand/session/gtcspring23-s51762/"" rel=""nofollow noreferrer"">https://www.nvidia.com/en-us/on-demand/session/gtcspring23-s51762/</a>).</p>
+<p>To get the number of available GPUs (each simulating a QPUs) I added the following (see <a href=""https://nvidia.github.io/cuda-quantum/api/languages/cpp_api.html#platform"" rel=""nofollow noreferrer"">https://nvidia.github.io/cuda-quantum/api/languages/cpp_api.html#platform</a>)</p>
+<pre class=""lang-cpp prettyprint-override""><code>auto &amp;platform = cudaq::get_platform();
+printf(&quot;Num QPU %zu\n&quot;, platform.num_qpus())
+</code></pre>
+<p>Once executed the application prints</p>
+<pre class=""lang-bash prettyprint-override""><code>[ ... ]
+Num QPU 1
+</code></pre>
+<p>while I am expecting</p>
+<pre class=""lang-bash prettyprint-override""><code>[ ... ]
+Num QPU 2
+</code></pre>
+<p>As a check I ran <code>nvidia-smi</code> inside the container and both GPUs are seen.</p>
+<p>I also built the code using the multi-gpu flag shown in the <a href=""https://nvidia.github.io/cuda-quantum/using/simulators.html#cuquantum-multi-node-multi-gpu"" rel=""nofollow noreferrer"">official documentation</a></p>
+<pre class=""lang-bash prettyprint-override""><code>nvq++ cuquantum_backends.cpp -o cuquantum_backends.x --qpu cuquantum_mgmn 
+</code></pre>
+<p>However that was not recognised by <code>nvq++</code>.</p>
+<p>I see many possibilities for the code to behave in this way, among those are <code>enroot</code> and me missing something in how CUDA Quantum and cuQuantum work together, but I do not see a solution. Does anyone has any suggestion?</p>
+<p>Thanks for helping</p>
+<p>Marco</p>
+"
+"75755628","","2023-03-16 11:27:09","1","1387","ModuleNotFoundError: No module named 'qiskit.chemistry'","<python><quantum-computing><qiskit>","2","<p>Ive been trying to solve this issue but this line is causing me trouble</p>
+<pre><code>from qiskit.chemistry.core import Hamiltonian, TransformationType
+</code></pre>
+<p>I know that i have to use qiskit nature instead of qiskit chemistry but i dont know to what i have to migrade to for &quot;Hamiltonian&quot; and &quot;TransformationType&quot;.</p>
+<pre><code>import numpy as np
+from qiskit import QuantumCircuit, Aer
+from qiskit.aqua import aqua_globals, QuantumInstance
+from qiskit.aqua.algorithms import VQE
+from qiskit.aqua.components.optimizers import SLSQP
+from qiskit.circuit.library import TwoLocal
+from qiskit.chemistry.drivers import PySCFDriver
+from qiskit.chemistry.core import Hamiltonian, TransformationType
+
+# Set the number of qubits and optimization parameters
+n_qubits = 4
+depth = 3
+
+# Set up the molecule and driver
+molecule = 'H .0 .0 -{0}; H .0 .0 {0}'
+distance = 0.74
+driver = PySCFDriver(atom=molecule.format(distance/2), 
+unit=TransformationType.ANGSTROM, charge=0, spin=0, basis='sto3g')
+qmolecule = driver.run()
+hamiltonian = qmolecule.get_molecular_hamiltonian()
+
+# Define the ansatz circuit
+ansatz = TwoLocal(n_qubits, ['ry', 'rz'], 'cz', reps=depth)
+
+# Define the optimizer
+optimizer = SLSQP(maxiter=1000)
+
+# Define the VQE algorithm
+vqe = VQE(ansatz, optimizer)
+
+# Run the VQE algorithm
+result = vqe.compute_minimum_eigenvalue(hamiltonian)
+
+# Print the energy of the ground state
+print('Ground state energy: ', result.eigenvalue.real)
+</code></pre>
+"
+"75688554","","2023-03-09 18:15:12","2","291","'RecursionError: maximum recursion depth exceeded' when training with QuantumKernelTrainer inside a QisKit IBM Runtime Session","<python><quantum-computing><qiskit>","0","<p>I am encountering a <code>RecursionError</code> when using the <a href=""https://github.com/Qiskit/qiskit-machine-learning/blob/5abda6c0fd303453229f9caabcd831de792fdd75/qiskit_machine_learning/kernels/algorithms/quantum_kernel_trainer.py"" rel=""nofollow noreferrer""><code>QuantumKernelTrainer</code> class</a> during the fitting process of a <a href=""https://github.com/Qiskit/qiskit-machine-learning/blob/5abda6c0fd303453229f9caabcd831de792fdd75/qiskit_machine_learning/kernels/trainable_fidelity_quantum_kernel.py"" rel=""nofollow noreferrer""><code>TrainableFidelityQuantumKernel</code> object</a> from the <a href=""https://github.com/Qiskit/qiskit-machine-learning.git"" rel=""nofollow noreferrer""><code>qiskit_machine_learning</code> package</a> within a Qiskit IBM Runtime session. To train the classifier over a noisy backend, I am manually setting a noise model in the <code>Sampler</code> options.</p>
+<p>However, the traceback reveals that the issue is related to the <code>deepcopy</code> function in the <code>copy</code> module, which is called by the internal functions of the <code>QuantumKernelTrainer</code>.</p>
+<p>I want to know if the issue I'm facing is due to a bug in the underlying code or if the approach I'm taking is incorrect. Can you help me figure this out?</p>
+<p>This is a minimal working example to prompt the error:</p>
+<pre><code>from qiskit.algorithms.optimizers import SLSQP
+from qiskit.algorithms.state_fidelities import ComputeUncompute
+from qiskit.circuit.library import TwoLocal
+from qiskit.providers.fake_provider import FakeBackendV2
+from qiskit.utils import algorithm_globals
+from qiskit_aer.noise import NoiseModel
+from qiskit_ibm_runtime import QiskitRuntimeService, Options, Session, Sampler
+from qiskit_machine_learning.kernels import TrainableFidelityQuantumKernel
+from qiskit_machine_learning.kernels.algorithms import QuantumKernelTrainer
+import numpy as np
+seed=2023
+
+algorithm_globals.random_seed = seed # Reproducibility purposes
+rand = algorithm_globals.random.uniform
+
+#Define a feature_map
+ansatz = TwoLocal(
+    num_qubits=2,
+    rotation_blocks=['rz','ry'],
+    entanglement_blocks='cx',
+    reps=1)
+
+#Random data set (4 features, 5 items)
+rand = algorithm_globals.random.uniform
+x_train = rand(0,2*np.pi,(5,4))
+y_train = np.heaviside(rand(-1,1,5),0)
+
+#Load QiskitRuntime Account
+service = QiskitRuntimeService()
+
+#Retrieve qasm_simulator
+backend = service.backends(simulator=True)[0]
+
+noise_model = NoiseModel.from_backend(FakeBackendV2())
+options_noise = {
+    'simulator': {
+        &quot;noise_model&quot;: noise_model,
+        &quot;seed_simulator&quot;: seed
+    },
+    'resilience_level': 0
+}
+
+with Session(service=service, backend=backend):
+
+    # Define a trainable kernel (last 4 parameters for training)
+    TFQK = TrainableFidelityQuantumKernel(
+        feature_map = ansatz,
+        fidelity = ComputeUncompute(
+            sampler=Sampler(options=options_noise)
+        ),
+        training_parameters = ansatz.parameters[4:8]
+    )
+
+    # Define quantum kernel trainer
+    QKT = QuantumKernelTrainer(
+        quantum_kernel=TFQK,
+        optimizer=SLSQP(maxiter=1000)
+    )
+
+    # Fit the quantum kernel
+    # This line prompts the error
+    QKT.fit(x_train,y_train)
+</code></pre>
+<p>The error obtained is the following:</p>
+<pre><code>---------------------------------------------------------------------------
+RecursionError                            Traceback (most recent call last)
+Cell In[3], line 56
+     49 QKT = QuantumKernelTrainer(
+     50     quantum_kernel=TFQK,
+     51     optimizer=SLSQP(maxiter=1000)
+     52 )
+     54 # Fit the quantum kernel
+     55 # This line prompts the error
+---&gt; 56 QKT.fit(x_train,y_train)
+
+File .../conda/envs/QC/lib/python3.9/site-packages/qiskit_machine_learning/kernels/algorithms/quantum_kernel_trainer.py:202, in QuantumKernelTrainer.fit(self, data, labels)
+    199     raise ValueError(msg)
+    201 # Bind inputs to objective function
+--&gt; 202 output_kernel = copy.deepcopy(self._quantum_kernel)
+    204 # Randomly initialize the initial point if one was not passed
+    205 if self._initial_point is None:
+
+File .../conda/envs/QC/lib/python3.9/copy.py:172, in deepcopy(x, memo, _nil)
+    170                 y = x
+    171             else:
+--&gt; 172                 y = _reconstruct(x, memo, *rv)
+    174 # If is its own copy, don't memoize.
+    175 if y is not x:
+
+File .../conda/envs/QC/lib/python3.9/copy.py:270, in _reconstruct(x, memo, func, args, state, listiter, dictiter, deepcopy)
+    268 if state is not None:
+    269     if deep:
+--&gt; 270         state = deepcopy(state, memo)
+    271     if hasattr(y, '__setstate__'):
+    272         y.__setstate__(state)
+
+File .../conda/envs/QC/lib/python3.9/copy.py:146, in deepcopy(x, memo, _nil)
+    144 copier = _deepcopy_dispatch.get(cls)
+    145 if copier is not None:
+--&gt; 146     y = copier(x, memo)
+    147 else:
+    148     if issubclass(cls, type):
+
+File .../conda/envs/QC/lib/python3.9/copy.py:230, in _deepcopy_dict(x, memo, deepcopy)
+    228 memo[id(x)] = y
+    229 for key, value in x.items():
+--&gt; 230     y[deepcopy(key, memo)] = deepcopy(value, memo)
+    231 return y
+
+File .../conda/envs/QC/lib/python3.9/copy.py:172, in deepcopy(x, memo, _nil)
+    170                 y = x
+    171             else:
+--&gt; 172                 y = _reconstruct(x, memo, *rv)
+    174 # If is its own copy, don't memoize.
+    175 if y is not x:
+
+File .../conda/envs/QC/lib/python3.9/copy.py:270, in _reconstruct(x, memo, func, args, state, listiter, dictiter, deepcopy)
+    268 if state is not None:
+    269     if deep:
+--&gt; 270         state = deepcopy(state, memo)
+    271     if hasattr(y, '__setstate__'):
+    272         y.__setstate__(state)
+
+File .../conda/envs/QC/lib/python3.9/copy.py:146, in deepcopy(x, memo, _nil)
+    144 copier = _deepcopy_dispatch.get(cls)
+    145 if copier is not None:
+--&gt; 146     y = copier(x, memo)
+    147 else:
+    148     if issubclass(cls, type):
+
+File .../conda/envs/QC/lib/python3.9/copy.py:230, in _deepcopy_dict(x, memo, deepcopy)
+    228 memo[id(x)] = y
+    229 for key, value in x.items():
+--&gt; 230     y[deepcopy(key, memo)] = deepcopy(value, memo)
+    231 return y
+
+    [... skipping similar frames: deepcopy at line 172 (3 times), _deepcopy_dict at line 230 (2 times), _reconstruct at line 270 (2 times), deepcopy at line 146 (2 times)]
+
+File .../conda/envs/QC/lib/python3.9/copy.py:270, in _reconstruct(x, memo, func, args, state, listiter, dictiter, deepcopy)
+    268 if state is not None:
+    269     if deep:
+--&gt; 270         state = deepcopy(state, memo)
+    271     if hasattr(y, '__setstate__'):
+    272         y.__setstate__(state)
+
+    [... skipping similar frames: _deepcopy_dict at line 230 (1 times), deepcopy at line 146 (1 times)]
+
+File .../conda/envs/QC/lib/python3.9/copy.py:146, in deepcopy(x, memo, _nil)
+    144 copier = _deepcopy_dispatch.get(cls)
+    145 if copier is not None:
+--&gt; 146     y = copier(x, memo)
+    147 else:
+    148     if issubclass(cls, type):
+
+File .../conda/envs/QC/lib/python3.9/copy.py:230, in _deepcopy_dict(x, memo, deepcopy)
+    228 memo[id(x)] = y
+    229 for key, value in x.items():
+--&gt; 230     y[deepcopy(key, memo)] = deepcopy(value, memo)
+    231 return y
+
+File .../conda/envs/QC/lib/python3.9/copy.py:172, in deepcopy(x, memo, _nil)
+    170                 y = x
+    171             else:
+--&gt; 172                 y = _reconstruct(x, memo, *rv)
+    174 # If is its own copy, don't memoize.
+    175 if y is not x:
+
+File .../conda/envs/QC/lib/python3.9/copy.py:271, in _reconstruct(x, memo, func, args, state, listiter, dictiter, deepcopy)
+    269 if deep:
+    270     state = deepcopy(state, memo)
+--&gt; 271 if hasattr(y, '__setstate__'):
+    272     y.__setstate__(state)
+    273 else:
+
+File .../conda/envs/QC/lib/python3.9/site-packages/qiskit_ibm_runtime/ibm_backend.py:196, in IBMBackend.__getattr__(self, name)
+    190 &quot;&quot;&quot;Gets attribute from self or configuration
+    191 
+    192 This magic method executes when user accesses an attribute that
+    193 does not yet exist on IBMBackend class.
+    194 &quot;&quot;&quot;
+    195 # Lazy load properties and pulse defaults and construct the target object.
+--&gt; 196 self._get_properties()
+    197 self._get_defaults()
+    198 self._convert_to_target()
+
+File .../conda/envs/QC/lib/python3.9/site-packages/qiskit_ibm_runtime/ibm_backend.py:217, in IBMBackend._get_properties(self)
+    215 def _get_properties(self) -&gt; None:
+    216     &quot;&quot;&quot;Gets backend properties and decodes it&quot;&quot;&quot;
+--&gt; 217     if not self._properties:
+    218         api_properties = self._api_client.backend_properties(self.name)
+    219         if api_properties:
+
+File .../conda/envs/QC/lib/python3.9/site-packages/qiskit_ibm_runtime/ibm_backend.py:196, in IBMBackend.__getattr__(self, name)
+    190 &quot;&quot;&quot;Gets attribute from self or configuration
+    191 
+    192 This magic method executes when user accesses an attribute that
+    193 does not yet exist on IBMBackend class.
+    194 &quot;&quot;&quot;
+    195 # Lazy load properties and pulse defaults and construct the target object.
+--&gt; 196 self._get_properties()
+    197 self._get_defaults()
+    198 self._convert_to_target()
+
+File .../conda/envs/QC/lib/python3.9/site-packages/qiskit_ibm_runtime/ibm_backend.py:217, in IBMBackend._get_properties(self)
+    215 def _get_properties(self) -&gt; None:
+    216     &quot;&quot;&quot;Gets backend properties and decodes it&quot;&quot;&quot;
+--&gt; 217     if not self._properties:
+    218         api_properties = self._api_client.backend_properties(self.name)
+    219         if api_properties:
+
+    [... skipping similar frames: IBMBackend.__getattr__ at line 196 (1471 times), IBMBackend._get_properties at line 217 (1470 times)]
+
+File .../conda/envs/QC/lib/python3.9/site-packages/qiskit_ibm_runtime/ibm_backend.py:217, in IBMBackend._get_properties(self)
+    215 def _get_properties(self) -&gt; None:
+    216     &quot;&quot;&quot;Gets backend properties and decodes it&quot;&quot;&quot;
+--&gt; 217     if not self._properties:
+    218         api_properties = self._api_client.backend_properties(self.name)
+    219         if api_properties:
+
+File .../conda/envs/QC/lib/python3.9/site-packages/qiskit_ibm_runtime/ibm_backend.py:196, in IBMBackend.__getattr__(self, name)
+    190 &quot;&quot;&quot;Gets attribute from self or configuration
+    191 
+    192 This magic method executes when user accesses an attribute that
+    193 does not yet exist on IBMBackend class.
+    194 &quot;&quot;&quot;
+    195 # Lazy load properties and pulse defaults and construct the target object.
+--&gt; 196 self._get_properties()
+    197 self._get_defaults()
+    198 self._convert_to_target()
+
+RecursionError: maximum recursion depth exceeded
+</code></pre>
+"
+"75495060","","2023-02-18 17:22:09","1","239","Commutator algebra in SymPy","<sympy><physics><quantum-computing>","1","<p>I am solving a commutator algebra in SymPy with the Hamiltonian</p>
+<pre><code>
+    from sympy import*
+    a=Operator(&quot;a&quot;)
+    ad=Dagger(a)
+    b=Operator(&quot;b&quot;)
+    bd=Dagger(b)
+
+    H= ad*a + bd*b
+</code></pre>
+<p>Is there any way I can define commutation relations such as $[a,a^\dagger]=1$,
+$[b,b^\dagger]=1$ and
+$[a,b]=0$ ?</p>
+<p>I want it such that if I calculate $[a,ad*b]$ I get $b$.
+There is a code in answer to one of the <a href=""https://stackoverflow.com/questions/59523322/in-sympy-simplify-an-expression-using-a-canonical-commutation-relation"">questions</a>  but it does not work in this case.</p>
+"
